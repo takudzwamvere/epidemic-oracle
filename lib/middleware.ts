@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import type { UserRole } from './roles'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -38,15 +39,68 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  const pathname = request.nextUrl.pathname
+
+  // Allow public routes
+  const isPublicRoute = 
+    pathname.startsWith('/auth') || 
+    pathname === '/' ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api')
+
+  if (!user && !isPublicRoute) {
+    // No user, redirect to login
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
+  }
+
+  // If user is authenticated, check role-based access
+  if (user) {
+    // Get user role from database
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', user.sub)
+      .single()
+
+    const userRole = profile?.role as UserRole | null
+
+    if (userRole) {
+      // Define protected route patterns
+      const isSuperAdminRoute = pathname.startsWith('/superadmin')
+      const isHealthAdminRoute = pathname.startsWith('/health-admin')
+      const isDefaultUserRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/protected')
+
+      // Role-based access control
+      if (isSuperAdminRoute && userRole !== 'superadmin') {
+        // Only superadmins can access superadmin routes
+        const url = request.nextUrl.clone()
+        url.pathname = getDefaultRedirectPath(userRole)
+        return NextResponse.redirect(url)
+      }
+
+      if (isHealthAdminRoute && userRole !== 'health_admin' && userRole !== 'superadmin') {
+        // Only health admins and superadmins can access health admin routes
+        const url = request.nextUrl.clone()
+        url.pathname = getDefaultRedirectPath(userRole)
+        return NextResponse.redirect(url)
+      }
+
+      // Redirect root path to role-specific dashboard
+      if (pathname === '/') {
+        const url = request.nextUrl.clone()
+        url.pathname = getDefaultRedirectPath(userRole)
+        return NextResponse.redirect(url)
+      }
+
+      // Redirect old /protected route to new role-based routes
+      if (pathname === '/protected') {
+        const url = request.nextUrl.clone()
+        url.pathname = getDefaultRedirectPath(userRole)
+        return NextResponse.redirect(url)
+      }
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
@@ -63,4 +117,17 @@ export async function updateSession(request: NextRequest) {
   // of sync and terminate the user's session prematurely!
 
   return supabaseResponse
+}
+
+// Helper function to get default redirect path based on role
+function getDefaultRedirectPath(role: UserRole): string {
+  switch (role) {
+    case 'superadmin':
+      return '/superadmin/dashboard'
+    case 'health_admin':
+      return '/health-admin/dashboard'
+    case 'default':
+    default:
+      return '/dashboard'
+  }
 }
