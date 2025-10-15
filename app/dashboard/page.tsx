@@ -1,12 +1,17 @@
 import { redirect } from 'next/navigation'
 import { LogoutButton } from '@/components/logout-button'
-import { getUserProfile } from '@/lib/roles'
+import { getUserProfile, getDefaultRedirectPath } from '@/lib/roles'
 
 export default async function DashboardPage() {
   const profile = await getUserProfile()
 
   if (!profile) {
     redirect('/auth/login')
+  }
+
+  // Redirect users to their role-specific dashboard
+  if (profile.role !== 'default') {
+    redirect(getDefaultRedirectPath(profile.role))
   }
 
   return (
