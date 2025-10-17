@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Download, Search, FileText, Calendar, HardDrive, RefreshCw } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import type { FileObject } from '@supabase/storage-js';
@@ -10,17 +10,24 @@ const Datasets = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize Supabase client
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jprkunnhbkcrljkgdinw.supabase.co',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
   const BUCKET_NAME = 'public-datasets';
 
-  const fetchDatasets = useCallback(async () => {
+  useEffect(() => {
+    fetchDatasets();
+  }, []);
+
+  const fetchDatasets = async () => {
     try {
       setLoading(true);
       setError(null);
+      
+      console.log('Fetching datasets from bucket:', BUCKET_NAME);
       
       const { data, error: listError } = await supabase
         .storage
@@ -32,24 +39,27 @@ const Datasets = () => {
         });
 
       if (listError) {
-        throw listError;
+        console.error('Supabase storage error:', listError);
+        throw new Error(`Storage error: ${listError.message}`);
       }
 
-      const files = (data || []).filter(item => item.id && !item.name.endsWith('/'));
+      console.log('Raw data from Supabase:', data);
+
+      // Filter out folders and null items
+      const files = (data || []).filter(item => 
+        item && item.id && !item.name.endsWith('/')
+      );
+
+      console.log('Filtered files:', files);
       setDatasets(files);
       
-    } catch (err: unknown) {
+    } catch (err: any) {
       console.error('Fetch error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch datasets';
-      setError(errorMessage);
+      setError(err.message || 'Failed to fetch datasets');
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
-
-  useEffect(() => {
-    fetchDatasets();
-  }, [fetchDatasets]);
+  };
 
   const formatFileSize = (bytes: number) => {
     if (!bytes) return 'N/A';
@@ -67,20 +77,41 @@ const Datasets = () => {
     });
   };
 
-  const handleDownload = (fileName: string) => {
-    const { data } = supabase
-      .storage
-      .from(BUCKET_NAME)
-      .getPublicUrl(fileName);
-    
-    if (data?.publicUrl) {
-      window.open(data.publicUrl, '_blank');
+  const handleDownload = async (fileName: string) => {
+    try {
+      // Get public URL
+      const { data } = supabase
+        .storage
+        .from(BUCKET_NAME)
+        .getPublicUrl(fileName);
+      
+      if (data?.publicUrl) {
+        console.log('Download URL:', data.publicUrl);
+        window.open(data.publicUrl, '_blank');
+      } else {
+        console.error('No public URL available');
+      }
+    } catch (err) {
+      console.error('Download error:', err);
     }
   };
 
   const filteredDatasets = datasets.filter(dataset =>
     dataset.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Test Supabase connection
+  const testConnection = async () => {
+    try {
+      const { data, error } = await supabase.storage.listBuckets();
+      if (error) throw error;
+      console.log('Available buckets:', data);
+      alert(`Available buckets: ${data.map(b => b.name).join(', ')}`);
+    } catch (err: any) {
+      console.error('Connection test failed:', err);
+      alert(`Connection test failed: ${err.message}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900">
@@ -98,19 +129,38 @@ const Datasets = () => {
               </div>
               <p className="text-emerald-200/80 text-lg sm:text-xl">Browse and download available datasets</p>
             </div>
-            <button
-              onClick={fetchDatasets}
-              disabled={loading}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
-            >
-              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={testConnection}
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors"
+              >
+                Test Connection
+              </button>
+              <button
+                onClick={fetchDatasets}
+                disabled={loading}
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Debug Info */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 mb-6">
+          <p className="text-yellow-200 text-sm">
+            <strong>Bucket:</strong> {BUCKET_NAME} | 
+            <strong> URL:</strong> {process.env.NEXT_PUBLIC_SUPABASE_URL ? '✓ Set' : '✗ Missing'} | 
+            <strong> Key:</strong> {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✓ Set' : '✗ Missing'}
+          </p>
+        </div>
+      </div>
+
+      {/* Rest of your component remains the same */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         {/* Search Bar */}
         <div className="mb-10">
@@ -142,14 +192,14 @@ const Datasets = () => {
             <div className="bg-black/20 border border-red-500/20 p-6 mb-6">
               <p className="text-sm text-emerald-200 font-semibold mb-4">Setup Required:</p>
               <ol className="text-sm text-emerald-200/70 space-y-3">
-                <li>1. Install Supabase: <code className="bg-black/40 px-2 py-1">npm install @supabase/supabase-js</code></li>
-                <li>2. Add to <code className="bg-black/40 px-1">.env.local</code>:
+                <li>1. Go to Supabase Dashboard → Storage → Create bucket named "public-datasets"</li>
+                <li>2. Set bucket to public and upload your CSV files</li>
+                <li>3. Ensure environment variables are set in <code className="bg-black/40 px-1">.env.local</code>:
                   <pre className="bg-black/40 p-4 mt-2 text-xs overflow-x-auto text-emerald-300">
-{`NEXT_PUBLIC_SUPABASE_URL=https://jprkunnhbkcrljkgdinw.supabase.co
+{`NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here`}
                   </pre>
                 </li>
-                <li>3. Ensure the bucket is public in Supabase dashboard</li>
               </ol>
             </div>
             <button
@@ -175,7 +225,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here`}
                   className="bg-gradient-to-br from-white/10 to-white/5 border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10 group"
                 >
                   <div className="p-6 sm:p-8">
-                    {/* Icon and Title */}
                     <div className="flex items-start gap-4 mb-6">
                       <div className="p-3 bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors flex-shrink-0">
                         <FileText className="w-6 h-6 text-emerald-400" />
@@ -187,7 +236,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here`}
                       </div>
                     </div>
 
-                    {/* Metadata */}
                     <div className="space-y-3 mb-6">
                       <div className="flex items-center gap-3 text-sm text-emerald-200/70">
                         <HardDrive className="w-4 h-4" />
@@ -199,7 +247,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here`}
                       </div>
                     </div>
 
-                    {/* Download Button */}
                     <button
                       onClick={() => handleDownload(dataset.name)}
                       className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 flex items-center justify-center gap-2 transition-colors"
@@ -210,9 +257,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here`}
                   </div>
                 </div>
               ))}
-            </div>
+          </div>
 
-            {/* Empty State */}
             {filteredDatasets.length === 0 && (
               <div className="text-center py-20">
                 <FileText className="w-16 h-16 text-emerald-500/20 mx-auto mb-4" />

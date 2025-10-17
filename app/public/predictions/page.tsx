@@ -1,380 +1,130 @@
-'use client';
-import React, { useState, useRef } from 'react';
-import { Upload, FileText, X, AlertCircle, CheckCircle, Loader2, Shield } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import React from 'react';
+import { TrendingUp, Wrench, Clock, Bell, Sparkles } from 'lucide-react';
 
-const PrivateDatasetUpload = () => {
-  const [uploading, setUploading] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
-  const [uploadStatus, setUploadStatus] = useState<{ [key: string]: 'pending' | 'uploading' | 'success' | 'error' }>({});
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Initialize Supabase client - use anon key for client-side operations
-  // For private uploads, we'll need to create an API route
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  const BUCKET_NAME = 'private-datasets';
-  const FOLDER_NAME = 'submitted-datasets';
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(event.target.files || []);
-    
-    // Filter for CSV files only
-    const csvFiles = selectedFiles.filter(file => 
-      file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv')
-    );
-
-    if (csvFiles.length !== selectedFiles.length) {
-      setError('Only CSV files are allowed. Non-CSV files were ignored.');
-      setTimeout(() => setError(null), 5000);
+const Predictions = () => {
+  const features = [
+    {
+      icon: TrendingUp,
+      title: "Advanced Market Analysis",
+      description: "Machine learning models analyzing market trends and patterns to provide accurate predictions"
+    },
+    {
+      icon: Clock,
+      title: "Real-time Updates",
+      description: "Get instant predictions as market conditions change throughout the day"
+    },
+    {
+      icon: Bell,
+      title: "Smart Notifications",
+      description: "Receive alerts when significant prediction changes occur or opportunities arise"
     }
+  ];
 
-    setFiles(prev => [...prev, ...csvFiles]);
-    
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  const removeFile = (index: number) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
-    
-    const fileName = files[index].name;
-    setUploadStatus(prev => {
-      const newStatus = { ...prev };
-      delete newStatus[fileName];
-      return newStatus;
-    });
-  };
-
-  const validateFiles = (): boolean => {
-    if (files.length === 0) {
-      setError('Please select at least one CSV file to upload.');
-      return false;
-    }
-
-    const maxSize = 50 * 1024 * 1024;
-    const oversizedFiles = files.filter(file => file.size > maxSize);
-    
-    if (oversizedFiles.length > 0) {
-      setError(`File ${oversizedFiles[0].name} exceeds the 50MB size limit.`);
-      return false;
-    }
-
-    return true;
-  };
-
-  const uploadFile = async (file: File): Promise<void> => {
-    const fileName = `${FOLDER_NAME}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    
-    setUploadStatus(prev => ({ ...prev, [file.name]: 'uploading' }));
-
-    try {
-      // For private bucket uploads, we need to use the service role key
-      // Since it's not available on client, we'll use an API route
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('fileName', fileName);
-      formData.append('bucketName', BUCKET_NAME);
-
-      const response = await fetch('/api/upload-private', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Upload failed');
-      }
-
-      setUploadStatus(prev => ({ ...prev, [file.name]: 'success' }));
-      
-    } catch (uploadError: unknown) {
-      console.error(`Upload error for ${file.name}:`, uploadError);
-      setUploadStatus(prev => ({ ...prev, [file.name]: 'error' }));
-      
-      const errorMessage = uploadError instanceof Error ? uploadError.message : 'Upload failed';
-      throw new Error(`Failed to upload ${file.name}: ${errorMessage}`);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!validateFiles()) return;
-
-    setUploading(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      // Initialize all files as pending
-      const initialStatus: { [key: string]: 'pending' } = {};
-      files.forEach(file => {
-        initialStatus[file.name] = 'pending';
-      });
-      setUploadStatus(initialStatus);
-
-      // Upload files sequentially
-      for (const file of files) {
-        await uploadFile(file);
-      }
-
-      setSuccess(`Successfully uploaded ${files.length} file(s) to private storage!`);
-      
-      // Clear files after successful upload
-      setTimeout(() => {
-        setFiles([]);
-        setUploadStatus({});
-      }, 3000);
-
-    } catch (err: unknown) {
-      console.error('Upload process error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Upload failed. Please try again.';
-      setError(errorMessage);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
-
-  const handleDrop = (event: React.DragEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const droppedFiles = Array.from(event.dataTransfer.files);
-    const csvFiles = droppedFiles.filter(file => 
-      file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv')
-    );
-
-    if (csvFiles.length !== droppedFiles.length) {
-      setError('Only CSV files are allowed. Non-CSV files were ignored.');
-      setTimeout(() => setError(null), 5000);
-    }
-
-    setFiles(prev => [...prev, ...csvFiles]);
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'uploading':
-        return <Loader2 className="w-4 h-4 animate-spin text-blue-500" />;
-      case 'success':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'error':
-        return <AlertCircle className="w-4 h-4 text-red-500" />;
-      default:
-        return <FileText className="w-4 h-4 text-gray-400" />;
-    }
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (!bytes) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
+  const stats = [
+    { value: "AI", label: "Powered Analytics" },
+    { value: "24/7", label: "Market Monitoring" },
+    { value: "100%", label: "Data-Driven" }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900">
       {/* Header */}
-      <div className="relative overflow-hidden border-b border-purple-500/20">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent"></div>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 relative">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-lg">
-                <Shield className="w-6 h-6 text-purple-400" />
-              </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white">
-                Upload Private Datasets
-              </h1>
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 relative">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 mb-3">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-emerald-500/20 rounded-xl mb-3 sm:mb-0">
+              <TrendingUp className="w-6 h-6 text-emerald-400" />
             </div>
-            <p className="text-purple-200/80 text-lg sm:text-xl max-w-2xl mx-auto">
-              Securely upload CSV files to private storage. Files are protected by service-level authentication.
-            </p>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white">Predictions</h1>
           </div>
+          <p className="text-emerald-200/80 text-lg sm:text-xl max-w-2xl">
+            AI-powered epidemic predictions and insights to help you stay ahead
+          </p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Upload Area */}
-        <div className="bg-white/5 border-2 border-dashed border-purple-500/30 rounded-xl p-8 mb-8 transition-colors hover:border-purple-500/50">
-          <div
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-            className="text-center"
-          >
-            <Upload className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">
-              Drop your CSV files here
-            </h3>
-            <p className="text-purple-200/60 mb-6">
-              or click to browse your files
-            </p>
-            
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept=".csv,text/csv"
-              onChange={handleFileSelect}
-              className="hidden"
-              id="file-upload"
-            />
-            <label
-              htmlFor="file-upload"
-              className="inline-flex items-center justify-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg cursor-pointer transition-colors"
-            >
-              <Upload className="w-5 h-5 mr-2" />
-              Select CSV Files
-            </label>
-            
-            <p className="text-sm text-purple-200/40 mt-4">
-              Maximum file size: 50MB per file • CSV files only
-            </p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        {/* Under Construction Card */}
+        <div className="mb-12 lg:mb-16">
+          <div className="bg-gradient-to-br from-white/10 to-white/5 border border-emerald-500/20 backdrop-blur-xl overflow-hidden shadow-2xl">
+            {/* Icon Section */}
+            <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 p-8 sm:p-12 lg:p-16 text-center">
+              <div className="flex justify-center mb-8">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-emerald-400/20 rounded-2xl blur-lg"></div>
+                  <div className="relative inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-emerald-400 to-emerald-500 shadow-lg">
+                    <Wrench className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+                  </div>
+                </div>
+              </div>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3">
+                System Under Development
+              </h2>
+              <p className="text-emerald-200/70 text-base sm:text-lg max-w-xl mx-auto">
+                Our prediction engine is currently being crafted to deliver exceptional insights
+              </p>
+            </div>
+
+            {/* Details Section */}
+            <div className="p-8 sm:p-10 lg:p-12">
+              <div className="space-y-6 sm:space-y-8">
+                {features.map((feature, idx) => {
+                  const Icon = feature.icon;
+                  return (
+                    <div key={idx} className="flex gap-4 sm:gap-6 group">
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-500/10 group-hover:bg-emerald-500/20 flex items-center justify-center transition-all duration-300 border border-emerald-500/20 group-hover:border-emerald-500/40">
+                          <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-400" />
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-white mb-2 text-base sm:text-lg">
+                          {feature.title}
+                        </h3>
+                        <p className="text-emerald-200/70 text-sm sm:text-base leading-relaxed">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Coming Soon Badge */}
+              <div className="mt-10 sm:mt-12 pt-8 sm:pt-10 border-t border-emerald-500/20">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="flex items-center justify-center gap-2 text-emerald-400">
+                    <Sparkles className="w-5 h-5" />
+                    <span className="font-semibold text-base sm:text-lg">Coming Soon</span>
+                  </div>
+                  <p className="text-center text-sm sm:text-base text-emerald-200/60">We&apos;re working hard to bring you the best prediction experience</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Error/Success Messages */}
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
-            <div className="flex-1">
-              <p className="text-red-200/80">{error}</p>
-            </div>
-            <button
-              onClick={() => setError(null)}
-              className="ml-auto text-red-400 hover:text-red-300 flex-shrink-0"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
-        {success && (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-6 flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-            <p className="text-green-200/80">{success}</p>
-            <button
-              onClick={() => setSuccess(null)}
-              className="ml-auto text-green-400 hover:text-green-300 flex-shrink-0"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
-        {/* File List */}
-        {files.length > 0 && (
-          <div className="bg-white/5 border border-purple-500/20 rounded-xl overflow-hidden mb-8">
-            <div className="bg-purple-500/10 px-6 py-4 border-b border-purple-500/20">
-              <h3 className="text-lg font-semibold text-white">
-                Selected Files ({files.length})
-              </h3>
-            </div>
-            
-            <div className="divide-y divide-purple-500/10">
-              {files.map((file, index) => (
-                <div key={index} className="px-6 py-4 flex items-center gap-4">
-                  <div className="flex-shrink-0">
-                    {getStatusIcon(uploadStatus[file.name] || 'pending')}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium truncate" title={file.name}>
-                      {file.name}
-                    </p>
-                    <p className="text-purple-200/60 text-sm">
-                      {formatFileSize(file.size)}
-                    </p>
-                  </div>
-
-                  {uploadStatus[file.name] && (
-                    <span className={`text-sm font-medium ${
-                      uploadStatus[file.name] === 'success' ? 'text-green-400' :
-                      uploadStatus[file.name] === 'error' ? 'text-red-400' :
-                      'text-purple-400'
-                    }`}>
-                      {uploadStatus[file.name]}
-                    </span>
-                  )}
-
-                  <button
-                    onClick={() => removeFile(index)}
-                    disabled={uploadStatus[file.name] === 'uploading'}
-                    className="text-purple-200/60 hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            {/* Upload Button */}
-            <div className="bg-purple-500/5 px-6 py-4 border-t border-purple-500/20">
-              <button
-                onClick={handleUpload}
-                disabled={uploading || files.length === 0}
-                className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+        {/* Stats Cards */}
+        <div>
+          <h3 className="text-center text-white/60 text-sm font-semibold uppercase tracking-widest mb-6 sm:mb-8">
+            Capabilities
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            {stats.map((stat, idx) => (
+              <div
+                key={idx}
+                className="group bg-gradient-to-br from-white/10 to-white/5 p-6 sm:p-8 border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10 cursor-default"
               >
-                {uploading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Uploading...
-                  </>
-                ) : (
-                  <>
-                    <Shield className="w-5 h-5" />
-                    Upload {files.length} File{files.length !== 1 ? 's' : ''} to Private Storage
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Security Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
-            <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-blue-200 font-semibold mb-2">Security Features</h4>
-                <ul className="text-blue-200/70 text-sm space-y-1">
-                  <li>• Secure API route authentication</li>
-                  <li>• Private bucket storage</li>
-                  <li>• Automatic file name sanitization</li>
-                  <li>• Timestamp prefixes for uniqueness</li>
-                </ul>
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent mb-3">
+                  {stat.value}
+                </div>
+                <p className="text-emerald-200/70 text-sm sm:text-base font-medium">
+                  {stat.label}
+                </p>
               </div>
-            </div>
-          </div>
-
-          <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-6">
-            <div className="flex items-start gap-3">
-              <FileText className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-purple-200 font-semibold mb-2">Storage Details</h4>
-                <ul className="text-purple-200/70 text-sm space-y-1">
-                  <li>• Bucket: <code>private-datasets</code></li>
-                  <li>• Folder: <code>submitted-datasets/</code></li>
-                  <li>• Max file size: 50MB</li>
-                  <li>• File type: CSV only</li>
-                </ul>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
@@ -382,4 +132,4 @@ const PrivateDatasetUpload = () => {
   );
 };
 
-export default PrivateDatasetUpload;
+export default Predictions;
