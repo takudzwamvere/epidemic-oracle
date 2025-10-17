@@ -1,13 +1,14 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Download, Search, FileText, Calendar, HardDrive, RefreshCw } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import type { FileObject } from '@supabase/storage-js';
 
 const Datasets = () => {
-  const [datasets, setDatasets] = useState([]);
+  const [datasets, setDatasets] = useState<FileObject[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jprkunnhbkcrljkgdinw.supabase.co',
@@ -16,11 +17,7 @@ const Datasets = () => {
 
   const BUCKET_NAME = 'public-datasets';
 
-  useEffect(() => {
-    fetchDatasets();
-  }, []);
-
-  const fetchDatasets = async () => {
+  const fetchDatasets = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -41,22 +38,27 @@ const Datasets = () => {
       const files = (data || []).filter(item => item.id && !item.name.endsWith('/'));
       setDatasets(files);
       
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Fetch error:', err);
-      setError(err.message || 'Failed to fetch datasets');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch datasets';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
-  const formatFileSize = (bytes) => {
+  useEffect(() => {
+    fetchDatasets();
+  }, [fetchDatasets]);
+
+  const formatFileSize = (bytes: number) => {
     if (!bytes) return 'N/A';
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -65,7 +67,7 @@ const Datasets = () => {
     });
   };
 
-  const handleDownload = (fileName) => {
+  const handleDownload = (fileName: string) => {
     const { data } = supabase
       .storage
       .from(BUCKET_NAME)

@@ -1,18 +1,17 @@
 'use client';
 import React, { useState, useRef } from 'react';
-import { Upload, FileText, X, AlertCircle, CheckCircle, Loader2, Shield } from 'lucide-react';
+import { Upload, FileText, X, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
 const PrivateDatasetUpload = () => {
   const [uploading, setUploading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const [uploadStatus, setUploadStatus] = useState<{ [key: string]: 'pending' | 'uploading' | 'success' | 'error' }>({});
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize Supabase client - use anon key for client-side operations
-  // For private uploads, we'll need to create an API route
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -45,7 +44,14 @@ const PrivateDatasetUpload = () => {
   const removeFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
     
+    // Remove from progress and status tracking
     const fileName = files[index].name;
+    setUploadProgress(prev => {
+      const newProgress = { ...prev };
+      delete newProgress[fileName];
+      return newProgress;
+    });
+    
     setUploadStatus(prev => {
       const newStatus = { ...prev };
       delete newStatus[fileName];
@@ -59,7 +65,8 @@ const PrivateDatasetUpload = () => {
       return false;
     }
 
-    const maxSize = 50 * 1024 * 1024;
+    // Check file sizes (max 50MB per file)
+    const maxSize = 50 * 1024 * 1024; // 50MB in bytes
     const oversizedFiles = files.filter(file => file.size > maxSize);
     
     if (oversizedFiles.length > 0) {
@@ -74,34 +81,28 @@ const PrivateDatasetUpload = () => {
     const fileName = `${FOLDER_NAME}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
     
     setUploadStatus(prev => ({ ...prev, [file.name]: 'uploading' }));
+    setUploadProgress(prev => ({ ...prev, [file.name]: 0 }));
 
     try {
-      // For private bucket uploads, we need to use the service role key
-      // Since it's not available on client, we'll use an API route
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('fileName', fileName);
-      formData.append('bucketName', BUCKET_NAME);
+      const { data, error } = await supabase.storage
+        .from(BUCKET_NAME)
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+          onUploadProgress: (progress) => {
+            const percent = (progress.loaded / progress.total!) * 100;
+            setUploadProgress(prev => ({ ...prev, [file.name]: percent }));
+          }
+        });
 
-      const response = await fetch('/api/upload-private', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Upload failed');
-      }
+      if (error) throw error;
 
       setUploadStatus(prev => ({ ...prev, [file.name]: 'success' }));
       
-    } catch (uploadError: unknown) {
-      console.error(`Upload error for ${file.name}:`, uploadError);
+    } catch (error: any) {
+      console.error(`Upload error for ${file.name}:`, error);
       setUploadStatus(prev => ({ ...prev, [file.name]: 'error' }));
-      
-      const errorMessage = uploadError instanceof Error ? uploadError.message : 'Upload failed';
-      throw new Error(`Failed to upload ${file.name}: ${errorMessage}`);
+      throw new Error(`Failed to upload ${file.name}: ${error.message}`);
     }
   };
 
@@ -120,7 +121,7 @@ const PrivateDatasetUpload = () => {
       });
       setUploadStatus(initialStatus);
 
-      // Upload files sequentially
+      // Upload files sequentially to avoid overwhelming the server
       for (const file of files) {
         await uploadFile(file);
       }
@@ -130,13 +131,12 @@ const PrivateDatasetUpload = () => {
       // Clear files after successful upload
       setTimeout(() => {
         setFiles([]);
+        setUploadProgress({});
         setUploadStatus({});
-      }, 3000);
+      }, 2000);
 
-    } catch (err: unknown) {
-      console.error('Upload process error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Upload failed. Please try again.';
-      setError(errorMessage);
+    } catch (err: any) {
+      setError(err.message || 'Upload failed. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -164,7 +164,7 @@ const PrivateDatasetUpload = () => {
     setFiles(prev => [...prev, ...csvFiles]);
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string, fileName: string) => {
     switch (status) {
       case 'uploading':
         return <Loader2 className="w-4 h-4 animate-spin text-blue-500" />;
@@ -194,14 +194,14 @@ const PrivateDatasetUpload = () => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-lg">
-                <Shield className="w-6 h-6 text-purple-400" />
+                <Upload className="w-6 h-6 text-purple-400" />
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white">
                 Upload Private Datasets
               </h1>
             </div>
             <p className="text-purple-200/80 text-lg sm:text-xl max-w-2xl mx-auto">
-              Securely upload CSV files to private storage. Files are protected by service-level authentication.
+              Securely upload CSV files to private storage. Files will be stored in the 'submitted-datasets' folder.
             </p>
           </div>
         </div>
@@ -251,12 +251,10 @@ const PrivateDatasetUpload = () => {
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
-            <div className="flex-1">
-              <p className="text-red-200/80">{error}</p>
-            </div>
+            <p className="text-red-200/80">{error}</p>
             <button
               onClick={() => setError(null)}
-              className="ml-auto text-red-400 hover:text-red-300 flex-shrink-0"
+              className="ml-auto text-red-400 hover:text-red-300"
             >
               <X className="w-4 h-4" />
             </button>
@@ -269,7 +267,7 @@ const PrivateDatasetUpload = () => {
             <p className="text-green-200/80">{success}</p>
             <button
               onClick={() => setSuccess(null)}
-              className="ml-auto text-green-400 hover:text-green-300 flex-shrink-0"
+              className="ml-auto text-green-400 hover:text-green-300"
             >
               <X className="w-4 h-4" />
             </button>
@@ -289,7 +287,7 @@ const PrivateDatasetUpload = () => {
               {files.map((file, index) => (
                 <div key={index} className="px-6 py-4 flex items-center gap-4">
                   <div className="flex-shrink-0">
-                    {getStatusIcon(uploadStatus[file.name] || 'pending')}
+                    {getStatusIcon(uploadStatus[file.name] || 'pending', file.name)}
                   </div>
                   
                   <div className="flex-1 min-w-0">
@@ -301,6 +299,24 @@ const PrivateDatasetUpload = () => {
                     </p>
                   </div>
 
+                  {/* Progress Bar */}
+                  {uploadStatus[file.name] === 'uploading' && (
+                    <div className="w-24 bg-purple-500/20 rounded-full h-2">
+                      <div
+                        className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress[file.name] || 0}%` }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Progress Percentage */}
+                  {uploadStatus[file.name] === 'uploading' && (
+                    <span className="text-purple-200/60 text-sm w-12 text-right">
+                      {Math.round(uploadProgress[file.name] || 0)}%
+                    </span>
+                  )}
+
+                  {/* Status Text */}
                   {uploadStatus[file.name] && (
                     <span className={`text-sm font-medium ${
                       uploadStatus[file.name] === 'success' ? 'text-green-400' :
@@ -314,7 +330,7 @@ const PrivateDatasetUpload = () => {
                   <button
                     onClick={() => removeFile(index)}
                     disabled={uploadStatus[file.name] === 'uploading'}
-                    className="text-purple-200/60 hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                    className="text-purple-200/60 hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -336,7 +352,7 @@ const PrivateDatasetUpload = () => {
                   </>
                 ) : (
                   <>
-                    <Shield className="w-5 h-5" />
+                    <Upload className="w-5 h-5" />
                     Upload {files.length} File{files.length !== 1 ? 's' : ''} to Private Storage
                   </>
                 )}
@@ -345,35 +361,19 @@ const PrivateDatasetUpload = () => {
           </div>
         )}
 
-        {/* Security Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
-            <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-blue-200 font-semibold mb-2">Security Features</h4>
-                <ul className="text-blue-200/70 text-sm space-y-1">
-                  <li>• Secure API route authentication</li>
-                  <li>• Private bucket storage</li>
-                  <li>• Automatic file name sanitization</li>
-                  <li>• Timestamp prefixes for uniqueness</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-6">
-            <div className="flex items-start gap-3">
-              <FileText className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-purple-200 font-semibold mb-2">Storage Details</h4>
-                <ul className="text-purple-200/70 text-sm space-y-1">
-                  <li>• Bucket: <code>private-datasets</code></li>
-                  <li>• Folder: <code>submitted-datasets/</code></li>
-                  <li>• Max file size: 50MB</li>
-                  <li>• File type: CSV only</li>
-                </ul>
-              </div>
+        {/* Information Card */}
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <h4 className="text-blue-200 font-semibold mb-2">Private Storage Information</h4>
+              <ul className="text-blue-200/70 text-sm space-y-1">
+                <li>• Files are uploaded to the <code className="bg-blue-500/20 px-1 rounded">private-datasets</code> bucket</li>
+                <li>• All files are stored in the <code className="bg-blue-500/20 px-1 rounded">submitted-datasets/</code> folder</li>
+                <li>• Uploaded files are not publicly accessible</li>
+                <li>• File names are prefixed with timestamps to ensure uniqueness</li>
+                <li>• Maximum file size: 50MB per file</li>
+              </ul>
             </div>
           </div>
         </div>
