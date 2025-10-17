@@ -9,10 +9,6 @@ const Datasets = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
 
-  // Initialize Supabase client
-  // You'll need to add these to your .env.local file:
-  // NEXT_PUBLIC_SUPABASE_URL=https://jprkunnhbkcrljkgdinw.supabase.co
-  // NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jprkunnhbkcrljkgdinw.supabase.co',
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -29,7 +25,6 @@ const Datasets = () => {
       setLoading(true);
       setError(null);
       
-      // List all files in the bucket using Supabase client
       const { data, error: listError } = await supabase
         .storage
         .from(BUCKET_NAME)
@@ -43,7 +38,6 @@ const Datasets = () => {
         throw listError;
       }
 
-      // Filter out folders (items without id or with name ending in /)
       const files = (data || []).filter(item => item.id && !item.name.endsWith('/'));
       setDatasets(files);
       
@@ -72,7 +66,6 @@ const Datasets = () => {
   };
 
   const handleDownload = (fileName) => {
-    // Get public URL for the file
     const { data } = supabase
       .storage
       .from(BUCKET_NAME)
@@ -88,24 +81,27 @@ const Datasets = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="relative overflow-hidden border-b border-emerald-500/20">
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 relative">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <HardDrive className="w-8 h-8 text-green-400" />
-                <h1 className="text-3xl font-bold text-gray-900">Public Datasets</h1>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-emerald-500/20">
+                  <HardDrive className="w-6 h-6 text-emerald-400" />
+                </div>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white">Public Datasets</h1>
               </div>
-              <p className="text-gray-600">Browse and download available datasets</p>
+              <p className="text-emerald-200/80 text-lg sm:text-xl">Browse and download available datasets</p>
             </div>
             <button
               onClick={fetchDatasets}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-green-400 hover:bg-green-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </button>
           </div>
@@ -113,17 +109,17 @@ const Datasets = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         {/* Search Bar */}
-        <div className="mb-8">
+        <div className="mb-10">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-emerald-400/50 w-5 h-5" />
             <input
               type="text"
               placeholder="Search datasets..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 focus:border-transparent outline-none transition-all"
+              className="w-full pl-12 pr-4 py-4 bg-white/10 border border-emerald-500/20 text-white placeholder-emerald-200/40 focus:border-emerald-500/40 focus:outline-none transition-colors"
             />
           </div>
         </div>
@@ -131,32 +127,32 @@ const Datasets = () => {
         {/* Loading State */}
         {loading && (
           <div className="flex flex-col justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mb-4"></div>
-            <p className="text-gray-600">Loading datasets...</p>
+            <div className="animate-spin w-12 h-12 border-2 border-emerald-500/30 border-t-emerald-400 mb-4"></div>
+            <p className="text-emerald-200/60 text-lg">Loading datasets...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && !loading && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
-            <h3 className="text-red-800 font-semibold mb-2">Failed to load datasets</h3>
-            <p className="text-red-700 mb-4">{error}</p>
-            <div className="bg-white border border-red-200 rounded p-4 mb-4">
-              <p className="text-sm text-gray-700 font-semibold mb-2">Setup Required:</p>
-              <ol className="text-sm text-gray-600 list-decimal list-inside space-y-1">
-                <li>Install Supabase: <code className="bg-gray-100 px-2 py-1 rounded">npm install @supabase/supabase-js</code></li>
-                <li>Add to <code className="bg-gray-100 px-1 rounded">.env.local</code>:
-                  <pre className="bg-gray-100 p-2 rounded mt-1 text-xs overflow-x-auto">
-NEXT_PUBLIC_SUPABASE_URL=https://jprkunnhbkcrljkgdinw.supabase.co{'\n'}
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+          <div className="bg-red-500/10 border border-red-500/30 p-8 mb-6">
+            <h3 className="text-red-300 font-semibold mb-2 text-lg">Failed to load datasets</h3>
+            <p className="text-red-200/70 mb-6">{error}</p>
+            <div className="bg-black/20 border border-red-500/20 p-6 mb-6">
+              <p className="text-sm text-emerald-200 font-semibold mb-4">Setup Required:</p>
+              <ol className="text-sm text-emerald-200/70 space-y-3">
+                <li>1. Install Supabase: <code className="bg-black/40 px-2 py-1">npm install @supabase/supabase-js</code></li>
+                <li>2. Add to <code className="bg-black/40 px-1">.env.local</code>:
+                  <pre className="bg-black/40 p-4 mt-2 text-xs overflow-x-auto text-emerald-300">
+{`NEXT_PUBLIC_SUPABASE_URL=https://jprkunnhbkcrljkgdinw.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here`}
                   </pre>
                 </li>
-                <li>Ensure the bucket is public in Supabase dashboard</li>
+                <li>3. Ensure the bucket is public in Supabase dashboard</li>
               </ol>
             </div>
             <button
               onClick={fetchDatasets}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors"
             >
               Try Again
             </button>
@@ -166,7 +162,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
         {/* Datasets Grid */}
         {!loading && !error && (
           <>
-            <div className="mb-4 text-sm text-gray-600">
+            <div className="mb-6 text-sm text-emerald-200/60">
               Showing {filteredDatasets.length} dataset{filteredDatasets.length !== 1 ? 's' : ''}
             </div>
             
@@ -174,28 +170,28 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
               {filteredDatasets.map((dataset, index) => (
                 <div
                   key={dataset.id || index}
-                  className="bg-white rounded-lg border border-gray-200 hover:border-green-400 transition-all duration-300 hover:shadow-lg group"
+                  className="bg-gradient-to-br from-white/10 to-white/5 border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10 group"
                 >
-                  <div className="p-6">
+                  <div className="p-6 sm:p-8">
                     {/* Icon and Title */}
-                    <div className="flex items-start gap-3 mb-4">
-                      <div className="p-2 bg-green-50 rounded-lg group-hover:bg-green-100 transition-colors">
-                        <FileText className="w-6 h-6 text-green-400" />
+                    <div className="flex items-start gap-4 mb-6">
+                      <div className="p-3 bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors flex-shrink-0">
+                        <FileText className="w-6 h-6 text-emerald-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 break-words" title={dataset.name}>
+                        <h3 className="text-base sm:text-lg font-semibold text-white break-words" title={dataset.name}>
                           {dataset.name}
                         </h3>
                       </div>
                     </div>
 
                     {/* Metadata */}
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-center gap-3 text-sm text-emerald-200/70">
                         <HardDrive className="w-4 h-4" />
                         <span>{formatFileSize(dataset.metadata?.size)}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-3 text-sm text-emerald-200/70">
                         <Calendar className="w-4 h-4" />
                         <span>{formatDate(dataset.created_at)}</span>
                       </div>
@@ -204,9 +200,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
                     {/* Download Button */}
                     <button
                       onClick={() => handleDownload(dataset.name)}
-                      className="w-full bg-green-400 hover:bg-green-500 text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                      className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 flex items-center justify-center gap-2 transition-colors"
                     >
-                      <Download className="w-4 h-4" />
+                      <Download className="w-5 h-5" />
                       Download
                     </button>
                   </div>
@@ -217,9 +213,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
             {/* Empty State */}
             {filteredDatasets.length === 0 && (
               <div className="text-center py-20">
-                <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No datasets found</h3>
-                <p className="text-gray-600">
+                <FileText className="w-16 h-16 text-emerald-500/20 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-white mb-2">No datasets found</h3>
+                <p className="text-emerald-200/60">
                   {searchTerm ? 'Try adjusting your search' : 'No datasets available at the moment'}
                 </p>
               </div>
