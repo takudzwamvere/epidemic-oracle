@@ -14,7 +14,8 @@ const DefaultHeader = () => {
     { label: 'Home', href: '/' },
     { label: 'Datasets', href: '/public/datasets' },
     { label: 'Predictions', href: '/public/predictions' },
-    { label: 'Admin', href: '/admin'}
+    { label: 'Admin', href: '/admin'},
+    { label: 'Super-Admin', href: '/superadmin'}
   ]
 
   return (

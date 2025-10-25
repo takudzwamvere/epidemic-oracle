@@ -1,83 +1,95 @@
+'use client';
 import React from 'react';
-import { BarChart3, Upload, Database, FileText, Users, Shield, TrendingUp } from 'lucide-react';
+import { BarChart3, Upload, Database, FileText, MapPin, TrendingUp, Activity } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const AdminDashboard = () => {
-  const stats = [
+  const router = useRouter();
+
+  // Mock data for a single health admin
+  const adminStats = [
     {
-      name: 'Total Datasets',
-      value: '24',
-      change: '+12%',
+      name: 'My Datasets',
+      value: '8',
+      change: '+2',
       changeType: 'positive',
       icon: Database,
-      description: 'Across all categories'
+      description: 'Total uploaded files'
     },
     {
       name: 'Quality Score',
-      value: '87%',
-      change: '+5%',
+      value: '84%',
+      change: '+3%',
       changeType: 'positive',
       icon: TrendingUp,
-      description: 'Average dataset quality'
+      description: 'Average quality grade'
     },
     {
-      name: 'Processed Files',
-      value: '156',
-      change: '+23%',
+      name: 'This Month',
+      value: '3',
+      change: '+1',
       changeType: 'positive',
       icon: FileText,
-      description: 'This month'
+      description: 'New uploads'
     },
     {
-      name: 'Active Users',
-      value: '42',
-      change: '+8%',
+      name: 'Data Records',
+      value: '2,457',
+      change: '+156',
       changeType: 'positive',
-      icon: Users,
-      description: 'System users'
+      icon: Activity,
+      description: 'Total health records'
     }
   ];
 
-  const recentActivities = [
+  const myRecentActivities = [
     {
       id: 1,
-      user: 'John Doe',
       action: 'uploaded',
-      target: 'epidemic_data.csv',
-      time: '2 minutes ago',
-      type: 'upload'
+      target: 'health_center_data.csv',
+      time: '2 hours ago',
+      type: 'upload',
+      status: 'processed',
+      quality: 'A'
     },
     {
       id: 2,
-      user: 'System',
-      action: 'processed',
-      target: 'health_metrics.csv',
-      time: '5 minutes ago',
-      type: 'processing'
+      action: 'uploaded',
+      target: 'community_health_workers.csv',
+      time: '1 day ago',
+      type: 'upload',
+      status: 'processed',
+      quality: 'B'
     },
     {
       id: 3,
-      user: 'Jane Smith',
       action: 'downloaded',
-      target: 'population_stats.csv',
-      time: '1 hour ago',
-      type: 'download'
+      target: 'processed_epidemic_data.csv',
+      time: '2 days ago',
+      type: 'download',
+      status: 'completed'
     },
     {
       id: 4,
-      user: 'System',
-      action: 'graded',
-      target: 'climate_data.csv',
-      time: '2 hours ago',
-      type: 'grading'
+      action: 'uploaded',
+      target: 'hospital_admissions.xml',
+      time: '3 days ago',
+      type: 'upload',
+      status: 'processed',
+      quality: 'A'
     }
   ];
+
+  const locationData = {
+    healthFacilities: 12,
+    population: 350000,
+    lastOutbreak: 'None detected'
+  };
 
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'upload': return <Upload className="w-4 h-4" />;
-      case 'processing': return <BarChart3 className="w-4 h-4" />;
       case 'download': return <Database className="w-4 h-4" />;
-      case 'grading': return <Shield className="w-4 h-4" />;
       default: return <FileText className="w-4 h-4" />;
     }
   };
@@ -85,42 +97,112 @@ const AdminDashboard = () => {
   const getActivityColor = (type: string) => {
     switch (type) {
       case 'upload': return 'text-blue-400';
-      case 'processing': return 'text-purple-400';
       case 'download': return 'text-green-400';
-      case 'grading': return 'text-yellow-400';
       default: return 'text-gray-400';
     }
+  };
+
+  const getQualityColor = (quality: string) => {
+    switch (quality) {
+      case 'A': return 'text-green-400';
+      case 'B': return 'text-blue-400';
+      case 'C': return 'text-yellow-400';
+      case 'D': return 'text-orange-400';
+      case 'F': return 'text-red-400';
+      default: return 'text-gray-400';
+    }
+  };
+
+  const handleNavigation = (path: string) => {
+    router.push(path);
   };
 
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-xl p-6">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white mb-2">Welcome back, Admin</h1>
-            <p className="text-purple-200/60">
-              Here&apos;s what&apos;s happening with your datasets today.
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-2 text-green-600">
+                <MapPin className="w-5 h-5" />
+                <span className="font-semibold">Health District</span>
+              </div>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, Health Administrator</h1>
+            <p className="text-gray-600">
+              Monitoring health data for your district. {locationData.lastOutbreak}.
             </p>
           </div>
-          <div className="hidden md:flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-lg">
-            <BarChart3 className="w-6 h-6 text-purple-400" />
+          <div className="hidden md:flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
+            <BarChart3 className="w-6 h-6 text-green-400" />
           </div>
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Location Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Health Facilities</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{locationData.healthFacilities}</p>
+            </div>
+            <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
+              <Activity className="w-6 h-6 text-green-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Population</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{(locationData.population / 1000).toFixed(0)}K</p>
+            </div>
+            <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
+              <TrendingUp className="w-6 h-6 text-green-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Outbreak Status</p>
+              <p className="text-2xl font-bold text-green-400 mt-1">Clear</p>
+            </div>
+            <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
+              <FileText className="w-6 h-6 text-green-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Last Report</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">3 days</p>
+            </div>
+            <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
+              <Database className="w-6 h-6 text-green-400" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* My Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <div key={stat.name} className="bg-white/5 border border-purple-500/20 rounded-xl p-6">
+        {adminStats.map((stat) => (
+          <div key={stat.name} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-200/60 text-sm font-medium">{stat.name}</p>
-                <p className="text-2xl font-bold text-white mt-1">{stat.value}</p>
-                <p className="text-purple-200/40 text-xs mt-1">{stat.description}</p>
+                <p className="text-gray-500 text-sm font-medium">{stat.name}</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                <p className="text-gray-400 text-xs mt-1">{stat.description}</p>
               </div>
-              <div className="flex items-center justify-center w-12 h-12 bg-purple-500/10 rounded-lg">
-                <stat.icon className="w-6 h-6 text-purple-400" />
+              <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
+                <stat.icon className="w-6 h-6 text-green-400" />
               </div>
             </div>
             <div className="flex items-center mt-4">
@@ -129,51 +211,99 @@ const AdminDashboard = () => {
               }`}>
                 {stat.change}
               </span>
-              <span className="text-purple-200/40 text-xs ml-2">from last month</span>
+              <span className="text-gray-400 text-xs ml-2">this week</span>
             </div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activity */}
-        <div className="bg-white/5 border border-purple-500/20 rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">Recent Activity</h2>
+        {/* My Recent Activity */}
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">My Recent Activity</h2>
           <div className="space-y-4">
-            {recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-center gap-4">
-                <div className={`flex-shrink-0 ${getActivityColor(activity.type)}`}>
-                  {getActivityIcon(activity.type)}
+            {myRecentActivities.map((activity) => (
+              <div key={activity.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className={`flex-shrink-0 ${getActivityColor(activity.type)}`}>
+                    {getActivityIcon(activity.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 text-sm">
+                      <span className="text-gray-500">You </span>
+                      <span className="text-gray-500">{activity.action} </span>
+                      <span className="font-medium truncate">{activity.target}</span>
+                    </p>
+                    <p className="text-gray-400 text-xs mt-1">{activity.time}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm">
-                    <span className="font-medium">{activity.user}</span>
-                    <span className="text-purple-200/60"> {activity.action} </span>
-                    <span className="font-medium">{activity.target}</span>
-                  </p>
-                  <p className="text-purple-200/40 text-xs mt-1">{activity.time}</p>
-                </div>
+                {activity.quality && (
+                  <div className={`px-2 py-1 rounded text-xs font-bold ${getQualityColor(activity.quality)} bg-white`}>
+                    {activity.quality}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white/5 border border-purple-500/20 rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Data Management</h2>
           <div className="space-y-3">
-            <button className="w-full flex items-center gap-3 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+            <button 
+              onClick={() => handleNavigation('/admin/upload')}
+              className="w-full flex items-center gap-3 px-4 py-3 bg-green-400 hover:bg-green-500 text-white rounded-lg transition-colors"
+            >
               <Upload className="w-5 h-5" />
-              <span>Upload New Dataset</span>
+              <span>Upload New Health Data</span>
             </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/20 rounded-lg transition-colors">
+            <button 
+              onClick={() => handleNavigation('/admin/datasets')}
+              className="w-full flex items-center gap-3 px-4 py-3 bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 rounded-lg transition-colors"
+            >
               <Database className="w-5 h-5" />
-              <span>Manage Datasets</span>
+              <span>View My Datasets</span>
             </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-500/20 rounded-lg transition-colors">
+            <button 
+              onClick={() => handleNavigation('/admin/reports')}
+              className="w-full flex items-center gap-3 px-4 py-3 bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 rounded-lg transition-colors"
+            >
               <FileText className="w-5 h-5" />
-              <span>View Reports</span>
+              <span>Quality Reports</span>
             </button>
+          </div>
+
+          {/* Data Format Support */}
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-600 mb-3">Supported Formats</h3>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="text-center p-2 bg-gray-50 rounded text-gray-700">CSV</div>
+              <div className="text-center p-2 bg-gray-50 rounded text-gray-700">JSON</div>
+              <div className="text-center p-2 bg-gray-50 rounded text-gray-700">XML</div>
+              <div className="text-center p-2 bg-gray-50 rounded text-gray-700">HL7</div>
+              <div className="text-center p-2 bg-gray-50 rounded text-gray-700">Excel</div>
+              <div className="text-center p-2 bg-gray-50 rounded text-gray-400">+ More</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* District Health Status */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">District Health Overview</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="text-green-600 text-2xl font-bold">12</div>
+            <div className="text-gray-600 text-sm">Active Facilities</div>
+          </div>
+          <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="text-green-600 text-2xl font-bold">8</div>
+            <div className="text-gray-600 text-sm">Datasets Submitted</div>
+          </div>
+          <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="text-green-600 text-2xl font-bold">84%</div>
+            <div className="text-gray-600 text-sm">Data Quality Score</div>
           </div>
         </div>
       </div>

@@ -1,8 +1,11 @@
+import DefaultFooter from "@/components/layout/default/Footer"
+import DefaultHeader from "@/components/layout/default/Header"
 
 export default async function DashboardPage() {
   
   return (
-    <div className="max-w-4xl">
+    <div className="w-full">
+      <DefaultHeader/>
       <div className="mb-8">
         <h1 className="text-3xl font-light text-slate-800 mb-2">User Dashboard</h1>
         <p className="text-slate-600 font-light">Welcome to your personal epidemic monitoring dashboard</p>
@@ -45,6 +48,7 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+      <DefaultFooter/>
     </div>
   )
 }

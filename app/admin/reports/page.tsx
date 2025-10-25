@@ -1,20 +1,15 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import {
   Search,
-  Filter,
   Download,
-  Eye,
-  BarChart3,
+  FileText,
   Star,
   AlertTriangle,
   CheckCircle,
-  XCircle,
-  TrendingUp,
-  FileText,
+  BarChart3,
   Calendar,
-  RefreshCw
+  X
 } from 'lucide-react';
 
 interface QualityReport {
@@ -35,341 +30,254 @@ interface QualityReport {
 }
 
 const QualityReports = () => {
-  const [reports, setReports] = useState<QualityReport[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterGrade, setFilterGrade] = useState<string>('all');
-  const [selectedReport, setSelectedReport] = useState<QualityReport | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  const BUCKET_NAME = 'private-datasets';
-  const FOLDER_NAME = 'submitted-datasets';
-
-  useEffect(() => {
-    fetchReports();
-  }, []);
-
-  const fetchReports = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // List all quality report files
-      const { data, error: listError } = await supabase
-        .storage
-        .from(BUCKET_NAME)
-        .list(`${FOLDER_NAME}/reports`, {
-          limit: 100,
-          offset: 0,
-          sortBy: { column: 'created_at', order: 'desc' }
-        });
-
-      if (listError) {
-        throw listError;
-      }
-
-      const reportFiles = (data || []).filter(item => 
-        item.id && !item.name.endsWith('/') && item.name.endsWith('_quality.json')
-      );
-
-      // Load each report
-      const loadedReports = await Promise.all(
-        reportFiles.map(async (file) => {
-          try {
-            const { data: reportData } = await supabase
-              .storage
-              .from(BUCKET_NAME)
-              .download(`${FOLDER_NAME}/reports/${file.name}`);
-
-            if (reportData) {
-              const reportText = await reportData.text();
-              const report = JSON.parse(reportText);
-              return {
-                ...report,
-                fileName: file.name.replace('_quality.json', '.csv'),
-                uploadedAt: file.created_at
-              };
-            }
-          } catch (error) {
-            console.error('Error loading report:', file.name, error);
-          }
-          return null;
-        })
-      );
-
-      setReports(loadedReports.filter((report): report is QualityReport => report !== null));
-      
-    } catch (err: unknown) {
-      console.error('Fetch error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch reports';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+  const [reports, setReports] = useState<QualityReport[]>([
+    {
+      fileName: 'gweru_health_center_data.csv',
+      overallGrade: 'A',
+      score: 92,
+      issues: [],
+      recommendations: ['Consider collecting more temporal data for trend analysis'],
+      preprocessingApplied: ['Missing values handled', 'Duplicates removed'],
+      metadata: {
+        rowCount: 2450,
+        columnCount: 15,
+        missingValues: 8,
+        duplicateRows: 3,
+        dataTypes: { age: 'numeric', district: 'categorical', date_admitted: 'date' }
+      },
+      uploadedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+    },
+    {
+      fileName: 'community_health_workers.csv',
+      overallGrade: 'B',
+      score: 84,
+      issues: ['Small dataset: Less than 100 rows may not be sufficient for robust ML training'],
+      recommendations: ['Collect more data to improve model robustness'],
+      preprocessingApplied: ['Missing values handled'],
+      metadata: {
+        rowCount: 850,
+        columnCount: 12,
+        missingValues: 15,
+        duplicateRows: 0,
+        dataTypes: { worker_id: 'numeric', region: 'categorical' }
+      },
+      uploadedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    },
+    {
+      fileName: 'hospital_admissions.csv',
+      overallGrade: 'A',
+      score: 88,
+      issues: [],
+      recommendations: [],
+      preprocessingApplied: ['Duplicate rows removed', 'Data type normalization'],
+      metadata: {
+        rowCount: 3100,
+        columnCount: 18,
+        missingValues: 5,
+        duplicateRows: 12,
+        dataTypes: { admission_date: 'date', patient_id: 'numeric' }
+      },
+      uploadedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
     }
-  };
+  ]);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedReport, setSelectedReport] = useState<QualityReport | null>(null);
 
   const getGradeColor = (grade: string) => {
     switch (grade) {
-      case 'A': return 'text-green-400 bg-green-400/20';
-      case 'B': return 'text-blue-400 bg-blue-400/20';
-      case 'C': return 'text-yellow-400 bg-yellow-400/20';
-      case 'D': return 'text-orange-400 bg-orange-400/20';
-      case 'F': return 'text-red-400 bg-red-400/20';
-      default: return 'text-gray-400 bg-gray-400/20';
+      case 'A': return 'text-green-600 bg-green-50';
+      case 'B': return 'text-blue-600 bg-blue-50';
+      case 'C': return 'text-yellow-600 bg-yellow-50';
+      case 'D': return 'text-orange-600 bg-orange-50';
+      case 'F': return 'text-red-600 bg-red-50';
+      default: return 'text-gray-600 bg-gray-50';
     }
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-400';
-    if (score >= 80) return 'text-blue-400';
-    if (score >= 70) return 'text-yellow-400';
-    if (score >= 60) return 'text-orange-400';
-    return 'text-red-400';
-  };
-
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      day: 'numeric'
     });
   };
 
-  const calculateAverageScore = () => {
-    if (reports.length === 0) return 0;
-    const total = reports.reduce((sum, report) => sum + report.score, 0);
-    return total / reports.length;
+  const filteredReports = reports.filter(report =>
+    report.fileName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const myStats = {
+    total: reports.length,
+    averageScore: reports.length > 0 
+      ? reports.reduce((sum, report) => sum + report.score, 0) / reports.length 
+      : 0,
+    issuesFound: reports.reduce((total, report) => total + report.issues.length, 0)
   };
-
-  const calculateGradeDistribution = () => {
-    const distribution = { A: 0, B: 0, C: 0, D: 0, F: 0 };
-    reports.forEach(report => {
-      distribution[report.overallGrade]++;
-    });
-    return distribution;
-  };
-
-  // Filter reports based on search and grade filter
-  const filteredReports = reports.filter(report => {
-    const matchesSearch = report.fileName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesGrade = filterGrade === 'all' || report.overallGrade === filterGrade;
-    return matchesSearch && matchesGrade;
-  });
-
-  const gradeDistribution = calculateGradeDistribution();
-  const averageScore = calculateAverageScore();
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Quality Reports</h1>
-          <p className="text-purple-200/60">Comprehensive analysis of dataset quality and ML readiness</p>
-        </div>
-        <button
-          onClick={fetchReports}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </button>
-      </div>
-
-      {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white/5 border border-purple-500/20 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-200/60 text-sm">Total Reports</p>
-              <p className="text-2xl font-bold text-white mt-1">{reports.length}</p>
-            </div>
-            <FileText className="w-8 h-8 text-purple-400" />
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Quality Reports</h1>
+            <p className="text-gray-600">Detailed analysis of your uploaded datasets</p>
           </div>
-        </div>
-        
-        <div className="bg-white/5 border border-purple-500/20 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-200/60 text-sm">Average Score</p>
-              <p className={`text-2xl font-bold mt-1 ${getScoreColor(averageScore)}`}>
-                {averageScore.toFixed(1)}
-              </p>
-            </div>
-            <TrendingUp className="w-8 h-8 text-purple-400" />
-          </div>
-        </div>
-        
-        <div className="bg-white/5 border border-purple-500/20 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-200/60 text-sm">Best Grade</p>
-              <p className="text-2xl font-bold text-green-400 mt-1">
-                {gradeDistribution.A > 0 ? 'A' : gradeDistribution.B > 0 ? 'B' : gradeDistribution.C > 0 ? 'C' : gradeDistribution.D > 0 ? 'D' : 'F'}
-              </p>
-            </div>
-            <Star className="w-8 h-8 text-purple-400" />
-          </div>
-        </div>
-        
-        <div className="bg-white/5 border border-purple-500/20 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-200/60 text-sm">Issues Found</p>
-              <p className="text-2xl font-bold text-orange-400 mt-1">
-                {reports.reduce((total, report) => total + report.issues.length, 0)}
-              </p>
-            </div>
-            <AlertTriangle className="w-8 h-8 text-purple-400" />
+          <div className="hidden md:flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
+            <BarChart3 className="w-6 h-6 text-green-400" />
           </div>
         </div>
       </div>
 
-      {/* Grade Distribution */}
-      <div className="bg-white/5 border border-purple-500/20 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Grade Distribution</h3>
-        <div className="grid grid-cols-5 gap-4">
-          {['A', 'B', 'C', 'D', 'F'].map(grade => (
-            <div key={grade} className="text-center">
-              <div className={`text-3xl font-bold mb-2 ${getGradeColor(grade).split(' ')[0]}`}>
-                {gradeDistribution[grade as keyof typeof gradeDistribution]}
-              </div>
-              <div className="text-purple-200/60 text-sm">Grade {grade}</div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Total Reports</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{myStats.total}</p>
             </div>
-          ))}
+            <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
+              <FileText className="w-6 h-6 text-green-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Average Score</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{myStats.averageScore.toFixed(1)}</p>
+              <p className="text-gray-400 text-xs mt-1">out of 100</p>
+            </div>
+            <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
+              <Star className="w-6 h-6 text-green-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm">Issues Found</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{myStats.issuesFound}</p>
+              <p className="text-gray-400 text-xs mt-1">across all datasets</p>
+            </div>
+            <div className="flex items-center justify-center w-12 h-12 bg-orange-50 rounded-lg">
+              <AlertTriangle className="w-6 h-6 text-orange-400" />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400/50 w-4 h-4" />
+      {/* Search */}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
-            placeholder="Search reports..."
+            placeholder="Search reports by filename..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white/10 border border-purple-500/20 text-white placeholder-purple-200/40 rounded-lg focus:border-purple-500/40 focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 text-gray-900 placeholder-gray-500 rounded-lg focus:border-green-400 focus:outline-none focus:ring-1 focus:ring-green-400"
           />
         </div>
-        <select
-          value={filterGrade}
-          onChange={(e) => setFilterGrade(e.target.value)}
-          className="px-4 py-2 bg-white/10 border border-purple-500/20 text-white rounded-lg focus:border-purple-500/40 focus:outline-none"
-        >
-          <option value="all">All Grades</option>
-          <option value="A">Grade A</option>
-          <option value="B">Grade B</option>
-          <option value="C">Grade C</option>
-          <option value="D">Grade D</option>
-          <option value="F">Grade F</option>
-        </select>
       </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
-          <p className="text-red-200">{error}</p>
-        </div>
-      )}
 
       {/* Reports Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {loading ? (
-          <div className="col-span-full flex justify-center items-center py-12">
-            <RefreshCw className="w-8 h-8 animate-spin text-purple-400" />
-          </div>
+          Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className="bg-white border border-gray-200 rounded-xl p-6 animate-pulse shadow-sm">
+              <div className="h-4 bg-gray-200 rounded mb-4"></div>
+              <div className="h-3 bg-gray-200 rounded mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+            </div>
+          ))
         ) : filteredReports.length > 0 ? (
           filteredReports.map((report, index) => (
             <div
               key={index}
-              className="bg-white/5 border border-purple-500/20 rounded-xl p-6 hover:border-purple-500/40 transition-colors cursor-pointer"
+              className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md hover:border-green-300 transition-all cursor-pointer shadow-sm"
               onClick={() => setSelectedReport(report)}
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-white font-semibold truncate" title={report.fileName}>
+                  <h3 className="text-gray-900 font-semibold truncate" title={report.fileName}>
                     {report.fileName}
                   </h3>
-                  <p className="text-purple-200/60 text-sm mt-1">
+                  <p className="text-gray-500 text-sm mt-1 flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
                     {formatDate(report.uploadedAt)}
                   </p>
                 </div>
-                <div className={`px-3 py-1 rounded-full text-sm font-bold ${getGradeColor(report.overallGrade)}`}>
+                <div className={`px-3 py-1 rounded text-sm font-bold ${getGradeColor(report.overallGrade)}`}>
                   {report.overallGrade}
                 </div>
               </div>
 
               {/* Score */}
-              <div className="flex items-center gap-2 mb-4">
-                <div className={`text-2xl font-bold ${getScoreColor(report.score)}`}>
-                  {report.score}
-                </div>
-                <span className="text-purple-200/60 text-sm">/ 100</span>
+              <div className="flex items-center gap-2 mb-4 bg-gray-50 p-3 rounded-lg">
+                <Star className="w-5 h-5 text-yellow-400" />
+                <div className="text-gray-900 text-xl font-bold">{report.score}</div>
+                <span className="text-gray-500 text-sm">/100</span>
               </div>
 
-              {/* Metadata */}
-              <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                <div>
-                  <span className="text-purple-200/60">Rows: </span>
-                  <span className="text-white">{report.metadata.rowCount}</span>
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                <div className="bg-gray-50 p-2 rounded">
+                  <span className="text-gray-600">Rows: </span>
+                  <span className="text-gray-900 font-medium">{report.metadata.rowCount}</span>
                 </div>
-                <div>
-                  <span className="text-purple-200/60">Columns: </span>
-                  <span className="text-white">{report.metadata.columnCount}</span>
+                <div className="bg-gray-50 p-2 rounded">
+                  <span className="text-gray-600">Columns: </span>
+                  <span className="text-gray-900 font-medium">{report.metadata.columnCount}</span>
                 </div>
-                <div>
-                  <span className="text-purple-200/60">Missing: </span>
-                  <span className="text-white">{report.metadata.missingValues}</span>
+                <div className="bg-gray-50 p-2 rounded">
+                  <span className="text-gray-600">Missing: </span>
+                  <span className="text-gray-900 font-medium">{report.metadata.missingValues}</span>
                 </div>
-                <div>
-                  <span className="text-purple-200/60">Duplicates: </span>
-                  <span className="text-white">{report.metadata.duplicateRows}</span>
+                <div className="bg-gray-50 p-2 rounded">
+                  <span className="text-gray-600">Duplicates: </span>
+                  <span className="text-gray-900 font-medium">{report.metadata.duplicateRows}</span>
                 </div>
               </div>
 
-              {/* Issues Summary */}
-              <div className="space-y-2">
+              {/* Issues & Status Summary */}
+              <div className="space-y-2 border-t border-gray-200 pt-4">
+                {report.issues.length > 0 ? (
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-orange-500" />
+                    <span className="text-orange-700 text-sm font-medium">
+                      {report.issues.length} issue{report.issues.length !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span className="text-green-700 text-sm font-medium">No issues</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
-                  {report.issues.length > 0 ? (
-                    <>
-                      <AlertTriangle className="w-4 h-4 text-orange-400" />
-                      <span className="text-orange-400 text-sm">
-                        {report.issues.length} issue{report.issues.length !== 1 ? 's' : ''} found
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      <span className="text-green-400 text-sm">No issues found</span>
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-blue-400" />
-                  <span className="text-blue-400 text-sm">
-                    {report.preprocessingApplied.length} preprocessing step{report.preprocessingApplied.length !== 1 ? 's' : ''} applied
+                  <BarChart3 className="w-4 h-4 text-blue-500" />
+                  <span className="text-blue-700 text-sm">
+                    {report.preprocessingApplied.length} preprocessing step{report.preprocessingApplied.length !== 1 ? 's' : ''}
                   </span>
                 </div>
               </div>
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center py-12">
-            <FileText className="w-12 h-12 text-purple-500/20 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-white mb-2">No reports found</h3>
-            <p className="text-purple-200/60">
-              {searchTerm || filterGrade !== 'all' ? 'Try adjusting your search or filters' : 'No quality reports available yet'}
+          <div className="col-span-full bg-white border border-gray-200 rounded-xl p-12 text-center shadow-sm">
+            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No reports found</h3>
+            <p className="text-gray-600">
+              {searchTerm 
+                ? 'Try adjusting your search' 
+                : 'Upload datasets to see quality reports'
+              }
             </p>
           </div>
         )}
@@ -377,113 +285,112 @@ const QualityReports = () => {
 
       {/* Report Detail Modal */}
       {selectedReport && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 border border-purple-500/20 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-purple-500/20">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white">Quality Report Details</h2>
-                <button
-                  onClick={() => setSelectedReport(null)}
-                  className="text-purple-200/60 hover:text-purple-100"
-                >
-                  <XCircle className="w-6 h-6" />
-                </button>
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-gray-200 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-lg">
+            <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Quality Report</h2>
+                <p className="text-gray-600 text-sm mt-1">{selectedReport.fileName}</p>
               </div>
-              <p className="text-purple-200/60 mt-1">{selectedReport.fileName}</p>
+              <button
+                onClick={() => setSelectedReport(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
             </div>
 
             <div className="p-6 space-y-6">
               {/* Grade and Score */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="text-center p-4 bg-white/5 rounded-lg">
-                  <div className={`text-4xl font-bold mb-2 ${getGradeColor(selectedReport.overallGrade).split(' ')[0]}`}>
+                <div className="text-center p-6 bg-green-50 rounded-lg border border-green-200">
+                  <div className={`text-5xl font-bold mb-2 ${getGradeColor(selectedReport.overallGrade).split(' ')[0]}`}>
                     {selectedReport.overallGrade}
                   </div>
-                  <div className="text-purple-200/60">Overall Grade</div>
+                  <div className="text-gray-600">Overall Grade</div>
                 </div>
-                <div className="text-center p-4 bg-white/5 rounded-lg">
-                  <div className={`text-4xl font-bold mb-2 ${getScoreColor(selectedReport.score)}`}>
-                    {selectedReport.score}
-                  </div>
-                  <div className="text-purple-200/60">Quality Score</div>
+                <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="text-5xl font-bold mb-2 text-gray-900">{selectedReport.score}</div>
+                  <div className="text-gray-600">Quality Score / 100</div>
                 </div>
               </div>
 
               {/* Metadata */}
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Dataset Metadata</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Dataset Overview</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <span className="text-purple-200/60">Rows: </span>
-                    <span className="text-white">{selectedReport.metadata.rowCount}</span>
+                  <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
+                    <div className="text-gray-900 font-bold text-lg">{selectedReport.metadata.rowCount}</div>
+                    <div className="text-gray-600 text-sm">Rows</div>
                   </div>
-                  <div>
-                    <span className="text-purple-200/60">Columns: </span>
-                    <span className="text-white">{selectedReport.metadata.columnCount}</span>
+                  <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
+                    <div className="text-gray-900 font-bold text-lg">{selectedReport.metadata.columnCount}</div>
+                    <div className="text-gray-600 text-sm">Columns</div>
                   </div>
-                  <div>
-                    <span className="text-purple-200/60">Missing Values: </span>
-                    <span className="text-white">{selectedReport.metadata.missingValues}</span>
+                  <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
+                    <div className="text-gray-900 font-bold text-lg">{selectedReport.metadata.missingValues}</div>
+                    <div className="text-gray-600 text-sm">Missing Values</div>
                   </div>
-                  <div>
-                    <span className="text-purple-200/60">Duplicate Rows: </span>
-                    <span className="text-white">{selectedReport.metadata.duplicateRows}</span>
+                  <div className="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
+                    <div className="text-gray-900 font-bold text-lg">{selectedReport.metadata.duplicateRows}</div>
+                    <div className="text-gray-600 text-sm">Duplicates Removed</div>
                   </div>
                 </div>
               </div>
 
               {/* Data Types */}
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Data Types</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Column Analysis</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {Object.entries(selectedReport.metadata.dataTypes).map(([column, type]) => (
-                    <div key={column} className="bg-white/5 rounded p-2 text-sm">
-                      <div className="text-white font-medium">{column}</div>
-                      <div className="text-purple-200/60 capitalize">{type}</div>
+                    <div key={column} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                      <div className="text-gray-900 font-medium truncate text-sm">{column}</div>
+                      <div className="text-gray-600 capitalize text-xs">{type}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Issues */}
-              {selectedReport.issues.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Issues Found</h3>
-                  <ul className="space-y-2">
-                    {selectedReport.issues.map((issue, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <AlertTriangle className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-orange-200">{issue}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              {/* Issues & Recommendations */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {selectedReport.issues.length > 0 && (
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-orange-900 mb-3">Issues Identified</h3>
+                    <ul className="space-y-2">
+                      {selectedReport.issues.map((issue, index) => (
+                        <li key={index} className="flex items-start gap-2 text-sm">
+                          <AlertTriangle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-orange-800">{issue}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {selectedReport.recommendations.length > 0 && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-blue-900 mb-3">Recommendations</h3>
+                    <ul className="space-y-2">
+                      {selectedReport.recommendations.map((recommendation, index) => (
+                        <li key={index} className="flex items-start gap-2 text-sm">
+                          <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-blue-800">{recommendation}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
 
-              {/* Preprocessing Applied */}
+              {/* Preprocessing Steps */}
               {selectedReport.preprocessingApplied.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Preprocessing Applied</h3>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-green-900 mb-3">Preprocessing Applied</h3>
                   <ul className="space-y-2">
                     {selectedReport.preprocessingApplied.map((step, index) => (
                       <li key={index} className="flex items-start gap-2 text-sm">
-                        <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-green-200">{step}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Recommendations */}
-              {selectedReport.recommendations.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Recommendations</h3>
-                  <ul className="space-y-2">
-                    {selectedReport.recommendations.map((recommendation, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <Star className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-blue-200">{recommendation}</span>
+                        <BarChart3 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-green-800">{step}</span>
                       </li>
                     ))}
                   </ul>

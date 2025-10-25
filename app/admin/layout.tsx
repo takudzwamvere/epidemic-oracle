@@ -47,6 +47,12 @@ const sidebarItems: SidebarItem[] = [
     icon: <FileText className="w-5 h-5" />,
     description: 'View data quality reports'
   },
+  {
+    name: 'Settings',
+    href: '/admin/settings',
+    icon: <Settings className="w-5 h-5" />,
+    description: 'Administrator Settings'
+  },
 ];
 
 export default function AdminLayout({
@@ -70,7 +76,7 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gray-50">
       {/* Mobile sidebar backdrop */}
       {mobileSidebarOpen && (
         <div 
@@ -82,26 +88,26 @@ export default function AdminLayout({
       {/* Sidebar */}
       <div className={`
         fixed inset-y-0 left-0 z-50
-        bg-slate-800/95 backdrop-blur-lg border-r border-purple-500/20
+        bg-white border-r border-gray-200 shadow-sm
         transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'w-64' : 'w-20'}
         ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between p-4 border-b border-purple-500/20">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
           {sidebarOpen && (
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-green-400 rounded-lg flex items-center justify-center">
                 <Shield className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-white font-bold text-lg">Admin Panel</h1>
-                <p className="text-purple-200/60 text-xs">Epidemic Oracle</p>
+                <h1 className="text-gray-900 font-bold text-lg">Admin Panel</h1>
+                <p className="text-gray-500 text-xs">Epidemic Oracle</p>
               </div>
             </div>
           )}
           {!sidebarOpen && (
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center mx-auto">
+            <div className="w-8 h-8 bg-green-400 rounded-lg flex items-center justify-center mx-auto">
               <Shield className="w-5 h-5 text-white" />
             </div>
           )}
@@ -110,7 +116,7 @@ export default function AdminLayout({
           {sidebarOpen && (
             <button
               onClick={toggleSidebar}
-              className="lg:flex hidden items-center justify-center w-8 h-8 text-purple-200/60 hover:text-purple-100 hover:bg-purple-500/20 rounded-lg transition-colors"
+              className="lg:flex hidden items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -130,14 +136,14 @@ export default function AdminLayout({
                 className={`
                   flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 group
                   ${isActive 
-                    ? 'bg-purple-500/20 text-purple-100 border-l-2 border-purple-400' 
-                    : 'text-purple-200/70 hover:text-purple-100 hover:bg-purple-500/10'
+                    ? 'bg-green-50 text-green-600 border-l-2 border-green-400' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   }
                 `}
               >
                 <div className={`
                   flex-shrink-0 transition-colors
-                  ${isActive ? 'text-purple-400' : 'text-purple-400/70 group-hover:text-purple-300'}
+                  ${isActive ? 'text-green-400' : 'text-gray-400 group-hover:text-gray-600'}
                 `}>
                   {item.icon}
                 </div>
@@ -146,7 +152,7 @@ export default function AdminLayout({
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium">{item.name}</div>
                     {item.description && (
-                      <div className="text-xs text-purple-200/40 truncate">
+                      <div className={`text-xs truncate ${isActive ? 'text-green-600/60' : 'text-gray-400'}`}>
                         {item.description}
                       </div>
                     )}
@@ -158,12 +164,12 @@ export default function AdminLayout({
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-purple-500/20">
+        <div className="p-4 border-t border-gray-200">
           {/* Expand/Collapse button for collapsed state */}
           {!sidebarOpen && (
             <button
               onClick={toggleSidebar}
-              className="w-full flex items-center justify-center py-2 text-purple-200/60 hover:text-purple-100 hover:bg-purple-500/20 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center py-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -174,7 +180,7 @@ export default function AdminLayout({
               {/* Back to main site */}
               <Link
                 href="/"
-                className="flex items-center gap-3 px-3 py-2 text-purple-200/60 hover:text-purple-100 hover:bg-purple-500/20 rounded-lg transition-colors"
+                className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <Home className="w-4 h-4" />
                 <span className="text-sm">Back to Site</span>
@@ -182,12 +188,12 @@ export default function AdminLayout({
               
               {/* User info */}
               <div className="flex items-center gap-3 px-3 py-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-slate-600 to-slate-500 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
                   <span className="text-white text-sm font-medium">A</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-white text-sm font-medium truncate">Admin User</div>
-                  <div className="text-purple-200/40 text-xs truncate">Administrator</div>
+                  <div className="text-gray-900 text-sm font-medium truncate">Admin User</div>
+                  <div className="text-gray-500 text-xs truncate">Administrator</div>
                 </div>
               </div>
             </div>
@@ -201,13 +207,13 @@ export default function AdminLayout({
         ${sidebarOpen ? 'lg:pl-64' : 'lg:pl-20'}
       `}>
         {/* Top Bar */}
-        <header className="bg-slate-800/50 backdrop-blur-lg border-b border-purple-500/20 sticky top-0 z-30">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-4">
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileSidebarOpen(true)}
-                className="lg:hidden flex items-center justify-center w-10 h-10 text-purple-200/60 hover:text-purple-100 hover:bg-purple-500/20 rounded-lg transition-colors"
+                className="lg:hidden flex items-center justify-center w-10 h-10 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -215,10 +221,10 @@ export default function AdminLayout({
               </button>
               
               {/* Breadcrumb */}
-              <div className="flex items-center gap-2 text-sm text-purple-200/60">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
                 <span>Admin</span>
                 <span>/</span>
-                <span className="text-purple-100 capitalize">
+                <span className="text-gray-900 font-medium capitalize">
                   {pathname.split('/').pop() || 'Dashboard'}
                 </span>
               </div>
@@ -226,7 +232,7 @@ export default function AdminLayout({
 
             {/* User actions */}
             <div className="flex items-center gap-3">
-              <button className="flex items-center gap-2 px-3 py-2 text-purple-200/60 hover:text-purple-100 hover:bg-purple-500/20 rounded-lg transition-colors text-sm">
+              <button className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors text-sm">
                 <Settings className="w-4 h-4" />
                 <span className="hidden sm:inline">Settings</span>
               </button>
@@ -235,7 +241,7 @@ export default function AdminLayout({
         </header>
 
         {/* Page Content */}
-        <main className="p-4 lg:p-6">
+        <main className="p-6 max-w-[1600px] mx-auto w-full">
           {children}
         </main>
       </div>
