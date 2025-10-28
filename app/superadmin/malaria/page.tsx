@@ -36,15 +36,86 @@ const supabase = createClient(
 
 const MapComponent = dynamic(() => import('@/components/Map'), { ssr: false });
 
+// EmailJS Service with Outlook SMTP
 const EmailAlertService = {
   async sendOutbreakAlert(disease: string, predictions: any[], nationalPrediction: any) {
-    console.log('Sending email alerts for:', disease);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    return true;
+    try {
+      console.log('🚨 Preparing email alert for:', disease);
+      
+      // Dynamically import EmailJS
+      const emailjs = (await import('@emailjs/browser')).default;
+      
+      // Initialize with your Public Key
+      emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!);
+      
+      const highRiskProvinces = predictions.filter((p: any) => p.risk_level === 'High');
+      const mediumRiskProvinces = predictions.filter((p: any) => p.risk_level === 'Medium');
+      
+      // Email template parameters
+      const templateParams = {
+        to_email: 'mveretakudzwa@proton.me',
+        disease_name: disease.charAt(0).toUpperCase() + disease.slice(1),
+        total_predicted_cases: nationalPrediction.total_predicted_cases?.toLocaleString() || '0',
+        overall_risk: nationalPrediction.average_risk || 'Low',
+        high_risk_count: nationalPrediction.high_risk_provinces?.length || 0,
+        model_confidence: nationalPrediction.overall_confidence || 0,
+        high_risk_provinces: highRiskProvinces.map(p => 
+          `${p.province}: ${p.predicted_cases?.toLocaleString()} cases (${p.growth_rate})`
+        ).join('; ') || 'None',
+        medium_risk_provinces: mediumRiskProvinces.map(p => 
+          `${p.province}: ${p.predicted_cases?.toLocaleString()} cases`
+        ).join('; ') || 'None',
+        total_provinces: predictions.length,
+        generated_date: new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        }),
+        generated_time: new Date().toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        alert_level: nationalPrediction.average_risk === 'High' ? 'CRITICAL' : 'WARNING',
+        from_name: 'Disease Prediction System'
+      };
+
+      console.log('📧 Sending email with Outlook SMTP...');
+      
+      // Send email using Outlook SMTP service
+      const result = await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,  // Your Outlook service ID
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!, // Your template ID
+        templateParams
+      );
+
+      console.log('✅ Email sent successfully!', result);
+      return { 
+        success: true, 
+        message: `✅ Alert sent successfully to mveretakudzwa@proton.me!`,
+        emailId: result.text 
+      };
+      
+    } catch (error: any) {
+      console.error('❌ Email sending failed:', error);
+      
+      let userMessage = 'Failed to send email alert';
+      
+      if (error?.text?.includes('SMTP')) {
+        userMessage = 'Email service configuration error';
+      } else if (error?.status === 400) {
+        userMessage = 'Invalid email template or parameters';
+      } else if (error?.status === 0) {
+        userMessage = 'Network error - please check your connection';
+      } else if (error?.text) {
+        userMessage = `Email error: ${error.text}`;
+      }
+      
+      throw new Error(userMessage);
+    }
   }
 };
 
-// Zimbabwe provinces with coordinates for highlighting entire regions
+// Zimbabwe provinces with coordinates
 const ZIMBABWE_PROVINCES = [
   { 
     name: 'Harare', 
@@ -109,8 +180,6 @@ const ZIMBABWE_PROVINCES = [
 ];
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#8DD1E1', '#D084D0', '#FF6B6B'];
-
-// Month names for better chart display
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const DiseasePredictionPage = () => {
@@ -125,6 +194,7 @@ const DiseasePredictionPage = () => {
   const [pieChartData, setPieChartData] = useState<any[]>([]);
   const [predicting, setPredicting] = useState(false);
   const [sendingAlerts, setSendingAlerts] = useState(false);
+  const [alertStatus, setAlertStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
 
   useEffect(() => {
     loadUploadedFiles();
@@ -197,7 +267,8 @@ const DiseasePredictionPage = () => {
 
   const generatePredictions = async () => {
     if (selectedFiles.length === 0) {
-      alert('Please select at least one dataset file');
+      setAlertStatus({ type: 'error', message: 'Please select at least one dataset file' });
+      setTimeout(() => setAlertStatus({ type: null, message: '' }), 3000);
       return;
     }
     
@@ -233,6 +304,12 @@ const DiseasePredictionPage = () => {
         }
       }
 
+      if (allData.length === 0) {
+        setAlertStatus({ type: 'error', message: 'No valid data found for 2025 predictions' });
+        setTimeout(() => setAlertStatus({ type: null, message: '' }), 3000);
+        return;
+      }
+
       const provincePredictions = generateProvincePredictions(allData);
       setPredictions(provincePredictions);
       
@@ -242,19 +319,23 @@ const DiseasePredictionPage = () => {
       const chart = generateChartData(allData, provincePredictions);
       setChartData(chart);
 
-      // Generate pie chart data
       const pieData = provincePredictions
         .sort((a, b) => b.predicted_cases - a.predicted_cases)
+        .slice(0, 10)
         .map((prediction, index) => ({
           name: prediction.province,
           value: prediction.predicted_cases,
           color: COLORS[index % COLORS.length]
         }));
       setPieChartData(pieData);
+
+      setAlertStatus({ type: 'success', message: 'Predictions generated successfully!' });
+      setTimeout(() => setAlertStatus({ type: null, message: '' }), 3000);
       
     } catch (error) {
       console.error('Error generating predictions:', error);
-      alert('Error generating predictions');
+      setAlertStatus({ type: 'error', message: 'Error generating predictions' });
+      setTimeout(() => setAlertStatus({ type: null, message: '' }), 3000);
     } finally {
       setPredicting(false);
     }
@@ -291,7 +372,7 @@ const DiseasePredictionPage = () => {
     
     if (lastMonth < 12) {
       const lastMonthData = monthlyData[lastMonth];
-      const avgGrowth = 0.15; // 15% average growth
+      const avgGrowth = 0.15;
       
       const predictionData = {
         month: nextMonth,
@@ -359,7 +440,6 @@ const DiseasePredictionPage = () => {
 
       const confidence = 80 + Math.floor(Math.random() * 15);
 
-      // Find province info with bounds for map highlighting
       const provinceInfo = ZIMBABWE_PROVINCES.find(p => 
         p.name.toLowerCase() === province.toLowerCase()
       ) || ZIMBABWE_PROVINCES[0];
@@ -416,17 +496,26 @@ const DiseasePredictionPage = () => {
 
   const sendEmailAlerts = async () => {
     if (predictions.length === 0 || !nationalPrediction) {
-      alert('No predictions available to send');
+      setAlertStatus({ type: 'error', message: 'No predictions available to send' });
+      setTimeout(() => setAlertStatus({ type: null, message: '' }), 3000);
       return;
     }
     
     setSendingAlerts(true);
     try {
-      await EmailAlertService.sendOutbreakAlert(disease, predictions, nationalPrediction);
-      alert('Email alerts sent successfully!');
-    } catch (error) {
+      const result = await EmailAlertService.sendOutbreakAlert(disease, predictions, nationalPrediction);
+      setAlertStatus({ 
+        type: 'success', 
+        message: result.message || '✅ Email alert sent successfully!' 
+      });
+      setTimeout(() => setAlertStatus({ type: null, message: '' }), 5000);
+    } catch (error: any) {
       console.error('Error sending alerts:', error);
-      alert('Error sending email alerts - check console');
+      setAlertStatus({ 
+        type: 'error', 
+        message: error.message || '❌ Failed to send email alert' 
+      });
+      setTimeout(() => setAlertStatus({ type: null, message: '' }), 5000);
     } finally {
       setSendingAlerts(false);
     }
@@ -450,6 +539,32 @@ const DiseasePredictionPage = () => {
 
   return (
     <div className="space-y-6">
+      {/* Alert Notification */}
+      {alertStatus.type && (
+        <div className={`p-4 rounded-lg border ${
+          alertStatus.type === 'success' 
+            ? 'bg-green-50 border-green-200 text-green-800' 
+            : 'bg-red-50 border-red-200 text-red-800'
+        }`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {alertStatus.type === 'success' ? (
+                <TrendingUp className="w-5 h-5" />
+              ) : (
+                <AlertTriangle className="w-5 h-5" />
+              )}
+              <span className="font-medium">{alertStatus.message}</span>
+            </div>
+            <button
+              onClick={() => setAlertStatus({ type: null, message: '' })}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
         <div className="flex items-center justify-between">
@@ -534,7 +649,7 @@ const DiseasePredictionPage = () => {
           <div className="flex gap-3">
             <button
               onClick={loadUploadedFiles}
-              className="flex items-center gap-2 px-4 py-2 bg-green-400 hover:bg-green-500 text-white font-semibold rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               Refresh Files
@@ -554,7 +669,7 @@ const DiseasePredictionPage = () => {
                     type="checkbox"
                     checked={selectedFiles.length === uploadedFiles.length && uploadedFiles.length > 0}
                     onChange={selectAllFiles}
-                    className="w-4 h-4 rounded border-gray-300 text-green-600"
+                    className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                   />
                   <span className="text-sm font-medium">
                     {selectedFiles.length === uploadedFiles.length ? 'Deselect All' : 'Select All'}
@@ -569,9 +684,13 @@ const DiseasePredictionPage = () => {
                 <button
                   onClick={generatePredictions}
                   disabled={selectedFiles.length === 0 || predicting}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-400 hover:bg-green-500 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Play className="w-4 h-4" />
+                  {predicting ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Play className="w-4 h-4" />
+                  )}
                   {predicting ? 'Generating...' : 'Generate Predictions'}
                 </button>
                 
@@ -579,9 +698,13 @@ const DiseasePredictionPage = () => {
                   <button
                     onClick={sendEmailAlerts}
                     disabled={sendingAlerts}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
                   >
-                    <Mail className="w-4 h-4" />
+                    {sendingAlerts ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Mail className="w-4 h-4" />
+                    )}
                     {sendingAlerts ? 'Sending...' : 'Send Alerts'}
                   </button>
                 )}
@@ -592,10 +715,10 @@ const DiseasePredictionPage = () => {
               {uploadedFiles.map((file, index) => (
                 <div
                   key={index}
-                  className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                  className={`p-4 border rounded-lg cursor-pointer transition-all ${
                     selectedFiles.includes(file.name)
-                      ? 'bg-green-50 border-green-300'
-                      : 'bg-white border-gray-200 hover:bg-gray-50'
+                      ? 'bg-green-50 border-green-300 shadow-sm'
+                      : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                   onClick={() => toggleFileSelection(file.name)}
                 >
@@ -604,7 +727,7 @@ const DiseasePredictionPage = () => {
                       type="checkbox"
                       checked={selectedFiles.includes(file.name)}
                       onChange={() => toggleFileSelection(file.name)}
-                      className="w-4 h-4 rounded border-gray-300 text-green-600"
+                      className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                     />
                     <FileText className="w-5 h-5 text-gray-400" />
                     <span className="text-gray-900 text-sm truncate font-medium">{file.name}</span>
@@ -617,6 +740,7 @@ const DiseasePredictionPage = () => {
           <div className="text-center py-8 text-gray-600 bg-gray-50 rounded-lg border border-gray-200">
             <Database className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p className="font-medium">No datasets found</p>
+            <p className="text-sm mt-1">Upload CSV files to get started with predictions</p>
           </div>
         )}
       </div>
