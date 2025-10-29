@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Home
 } from 'lucide-react';
+import { LogoutButton } from '@/components/logout-button';
 
 interface SidebarItem {
   name: string;
@@ -52,6 +53,12 @@ const sidebarItems: SidebarItem[] = [
     href: '/admin/settings',
     icon: <Settings className="w-5 h-5" />,
     description: 'Administrator Settings'
+  },
+  {
+    name: 'SysAdmin',
+    href: '/superadmin',
+    icon: <Settings className="w-5 h-5" />,
+    description: 'SuperAdmin'
   },
 ];
 
@@ -237,6 +244,7 @@ export default function AdminLayout({
                 <span className="hidden sm:inline">Settings</span>
               </button>
             </div>
+            <LogoutButton/>
           </div>
         </header>
 

@@ -17,6 +17,7 @@ import {
   TrendingUp,
   AlertTriangle
 } from 'lucide-react';
+import { LogoutButton } from '@/components/logout-button';
 
 interface SidebarItem {
   name: string;
@@ -63,17 +64,11 @@ const sidebarItems: SidebarItem[] = [
     description: 'Typhoid fever analysis'
   },
   {
-    name: 'All Predictions',
-    href: '/superadmin/all-diseases',
+    name: 'Officials',
+    href: '/superadmin/users',
     icon: <Database className="w-5 h-5" />,
-    description: 'Compare all diseases'
+    description: 'Manage alert recepients'
   },
-  {
-    name: 'System Settings',
-    href: '/superadmin/settings',
-    icon: <Settings className="w-5 h-5" />,
-    description: 'Model configuration'
-  }
 ];
 
 export default function SuperAdminLayout({
@@ -165,6 +160,7 @@ export default function SuperAdminLayout({
             <Home className="w-4 h-4" />
             {sidebarOpen && <span className="text-sm">Back to Admin</span>}
           </Link>
+          <LogoutButton/>
         </div>
       </div>
 

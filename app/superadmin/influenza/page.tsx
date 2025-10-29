@@ -31,7 +31,8 @@ import {
   Brain,
   Microscope,
   Shield,
-  AlertCircle
+  AlertCircle,
+  Wind
 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import dynamic from 'next/dynamic';
@@ -112,8 +113,8 @@ const ZIMBABWE_PROVINCES = [
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#8DD1E1', '#D084D0', '#FF6B6B'];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-// Malaria AI Service
-const generateMalariaAnalysis = async (predictions: any[], nationalPrediction: any) => {
+// Influenza AI Service
+const generateInfluenzaAnalysis = async (predictions: any[], nationalPrediction: any) => {
   // Simulate AI processing time
   await new Promise(resolve => setTimeout(resolve, 2500));
   
@@ -122,49 +123,49 @@ const generateMalariaAnalysis = async (predictions: any[], nationalPrediction: a
   const totalCases = nationalPrediction.total_predicted_cases;
   
   // Intelligent analysis based on data patterns
-  const outbreakSeverity = totalCases > 10000 ? 'severe' : totalCases > 5000 ? 'moderate' : 'contained';
+  const outbreakSeverity = totalCases > 8000 ? 'severe' : totalCases > 3000 ? 'moderate' : 'contained';
   const responseLevel = highRiskProvinces.length >= 3 ? 'EMERGENCY' : highRiskProvinces.length >= 1 ? 'HIGH_ALERT' : 'MONITORING';
   
   const analysis = {
-    nationalOverview: `🔍 **Malaria Threat Assessment**: Zimbabwe is experiencing a ${outbreakSeverity} malaria outbreak with ${totalCases.toLocaleString()} projected cases. ${highRiskProvinces.length} provinces are at high risk, indicating ${highRiskProvinces.length >= 3 ? 'widespread transmission' : 'localized hotspots'}. The data suggests ${nationalPrediction.average_risk === 'High' ? 'accelerating transmission' : 'stable but concerning'} patterns.`,
+    nationalOverview: `🌬️ **Influenza Threat Assessment**: Zimbabwe is experiencing a ${outbreakSeverity} influenza outbreak with ${totalCases.toLocaleString()} projected cases. ${highRiskProvinces.length} provinces are at high risk, indicating ${highRiskProvinces.length >= 3 ? 'widespread respiratory transmission' : 'localized seasonal clusters'}. The data suggests ${nationalPrediction.average_risk === 'High' ? 'accelerating transmission' : 'stable but concerning'} patterns.`,
     
-    transmissionAnalysis: `🦟 **Transmission Dynamics**: Analysis indicates ${highRiskProvinces.length > 0 ? 'multiple active transmission zones' : 'focused transmission points'}. Seasonal patterns show ${new Date().getMonth() >= 10 || new Date().getMonth() <= 3 ? 'peak rainy season conditions favoring mosquito breeding' : 'moderate transmission conditions'}. Vector density appears ${totalCases > 8000 ? 'exceptionally high' : 'within seasonal norms'}.`,
+    transmissionAnalysis: `🦠 **Transmission Dynamics**: Analysis indicates ${highRiskProvinces.length > 0 ? 'multiple active influenza strains circulating' : 'focused transmission points'}. Seasonal patterns show ${new Date().getMonth() >= 4 && new Date().getMonth() <= 8 ? 'winter season conditions favoring respiratory transmission' : 'moderate transmission conditions'}. Strain virulence appears ${totalCases > 6000 ? 'highly transmissible' : 'moderately transmissible'}.`,
     
     provincialAnalysis: predictions.map(pred => {
       const cases = pred.predicted_cases;
       let analysis = "";
       
       if (pred.risk_level === 'High') {
-        analysis = `🚨 **CRITICAL SITUATION**: ${pred.province} shows explosive growth potential with ${cases} projected cases (${pred.growth_rate}). Immediate deployment of: 1) Indoor Residual Spraying teams, 2) Emergency bed net distribution, 3) Community case detection. Historical data suggests this could be a super-spreader province.`;
+        analysis = `🚨 **CRITICAL SITUATION**: ${pred.province} shows rapid respiratory spread with ${cases} projected cases (${pred.growth_rate}). Immediate deployment of: 1) Antiviral distribution teams, 2) Emergency vaccination drives, 3) Hospital capacity expansion. Schools and workplaces showing high transmission rates.`;
       } else if (pred.risk_level === 'Medium') {
-        analysis = `⚠️ **ELEVATED RISK**: ${pred.province} at moderate risk with ${cases} cases. Recommend: 1) Targeted IRS in high-burden wards, 2) Stockpile ACTs at health centers, 3) Enhanced surveillance. Watch for clustering in ${cases > 800 ? 'peri-urban areas' : 'rural settlements'}.`;
+        analysis = `⚠️ **ELEVATED RISK**: ${pred.province} at moderate risk with ${cases} cases. Recommend: 1) Enhanced surveillance in schools, 2) Public health messaging, 3) Stockpile antiviral medications. Watch for clustering in ${cases > 600 ? 'educational institutions' : 'workplace settings'}.`;
       } else {
-        analysis = `✅ **CONTROLLED ZONE**: ${pred.province} maintaining low transmission with ${cases} cases. Focus on: 1) Sustaining bed net coverage >80%, 2) Passive surveillance, 3) Community awareness. Ideal for testing new intervention strategies.`;
+        analysis = `✅ **CONTROLLED ZONE**: ${pred.province} maintaining low transmission with ${cases} cases. Focus on: 1) Sustaining vaccination coverage, 2) Routine surveillance, 3) Community awareness. Ideal for maintaining normal activities.`;
       }
       return { province: pred.province, analysis, risk: pred.risk_level };
     }),
     
     recommendations: [
-      `🎯 **IMMEDIATE ACTIONS**: ${responseLevel} response activated. Deploy rapid response teams to ${highRiskProvinces.map(p => p.province).join(', ')} within 48 hours.`,
-      `🛡️ **VECTOR CONTROL**: Scale up Indoor Residual Spraying to cover 85% of structures in high-risk provinces. Prioritize pyrethroid-resistant areas for alternative insecticides.`,
-      `🧬 **DIAGNOSTICS & TREATMENT**: Pre-position ${Math.ceil(totalCases * 0.3)} rapid diagnostic tests and ${Math.ceil(totalCases * 0.25)} ACT courses at provincial warehouses.`,
-      `🏥 **HEALTH SYSTEM READINESS**: Activate emergency beds in ${highRiskProvinces.length} provinces. Train ${Math.ceil(totalCases * 0.02)} community health workers in severe case management.`,
-      `📊 **DATA-DRIVEN RESPONSE**: Establish real-time surveillance in ${mediumRiskProvinces.length + highRiskProvinces.length} provinces. Monitor resistance patterns weekly.`,
-      `🌧️ **CLIMATE ADAPTATION**: ${new Date().getMonth() >= 10 ? 'Implement larval source management ahead of peak rains' : 'Maintain dry season vector control intensity'}`
+      `🎯 **IMMEDIATE ACTIONS**: ${responseLevel} response activated. Deploy antiviral distribution to ${highRiskProvinces.map(p => p.province).join(', ')} within 72 hours.`,
+      `💊 **ANTIVIRAL STRATEGY**: Scale up oseltamivir distribution to cover 70% of high-risk populations. Mobile vaccination units for remote areas.`,
+      `🏥 **HEALTHCARE CAPACITY**: Prepare ${Math.ceil(totalCases * 0.03)} additional hospital beds and ${Math.ceil(totalCases * 0.05)} outpatient facilities. Stockpile oxygen and respiratory support equipment.`,
+      `🔍 **SURVEILLANCE & TESTING**: Establish ${Math.ceil(highRiskProvinces.length * 4)} sentinel surveillance sites. Train ${Math.ceil(totalCases * 0.015)} healthcare workers in rapid testing.`,
+      `🏫 **COMMUNITY MEASURES**: ${totalCases > 5000 ? 'Consider temporary school closures in worst-affected areas' : 'Maintain enhanced hygiene in schools and workplaces'}`,
+      `💉 **VACCINATION CAMPAIGN**: Launch targeted vaccination for high-risk groups including ${Math.ceil(totalCases * 0.4)} elderly and ${Math.ceil(totalCases * 0.3)} chronic disease patients.`
     ],
     
     predictiveInsights: [
-      `📈 **Outbreak Trajectory**: Models project ${totalCases > 10000 ? 'continued growth over next 4-6 weeks' : 'plateau within 2-3 weeks'} without intervention.`,
-      `🎯 **Hotspot Identification**: ${highRiskProvinces.slice(0, 2).map(p => p.province).join(' and ')} showing characteristics of super-spreader zones.`,
+      `📈 **Outbreak Trajectory**: Models project ${totalCases > 8000 ? 'peak in 4-5 weeks without intervention' : 'plateau within 3-4 weeks'} with current measures.`,
+      `🎯 **Cluster Identification**: ${highRiskProvinces.slice(0, 2).map(p => p.province).join(' and ')} showing characteristics of new variant circulation.`,
       `🕒 **Critical Window**: Optimal intervention period is next 14 days to prevent ${Math.ceil(totalCases * 1.3).toLocaleString()} potential cases.`,
-      `💰 **Resource Optimization**: Focus 70% of resources on ${highRiskProvinces.length} high-risk provinces for maximum impact.`
+      `💰 **Resource Optimization**: Focus 60% of resources on ${highRiskProvinces.length} high-risk provinces for maximum impact.`
     ]
   };
   
   return analysis;
 };
 
-// AI Analysis Content Component - Separate component to maintain hook order
+// AI Analysis Content Component
 const AIAnalysisContent = ({ aiAnalysis }: { aiAnalysis: any }) => {
   const nationalOverviewText = useTypewriter(aiAnalysis.nationalOverview, 15);
   const transmissionAnalysisText = useTypewriter(aiAnalysis.transmissionAnalysis, 20);
@@ -172,16 +173,16 @@ const AIAnalysisContent = ({ aiAnalysis }: { aiAnalysis: any }) => {
   return (
     <div className="space-y-8">
       {/* National Overview */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-6 rounded-lg shadow-sm">
+      <div className="bg-gradient-to-r from-sky-50 to-blue-50 border-l-4 border-sky-500 p-6 rounded-lg shadow-sm">
         <div className="flex items-center gap-3 mb-4">
-          <Microscope className="w-6 h-6 text-blue-600" />
-          <h3 className="text-lg font-bold text-blue-900">National Outbreak Intelligence</h3>
+          <Wind className="w-6 h-6 text-sky-600" />
+          <h3 className="text-lg font-bold text-sky-900">National Outbreak Intelligence</h3>
         </div>
         <div className="space-y-3">
-          <p className="text-blue-800 leading-relaxed text-lg">
+          <p className="text-sky-800 leading-relaxed text-lg">
             {nationalOverviewText}
           </p>
-          <p className="text-blue-700 leading-relaxed">
+          <p className="text-sky-700 leading-relaxed">
             {transmissionAnalysisText}
           </p>
         </div>
@@ -206,10 +207,10 @@ const AIAnalysisContent = ({ aiAnalysis }: { aiAnalysis: any }) => {
       </div>
 
       {/* Strategic Recommendations */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 p-6 rounded-lg shadow-sm">
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500 p-6 rounded-lg shadow-sm">
         <div className="flex items-center gap-3 mb-6">
-          <Shield className="w-6 h-6 text-green-600" />
-          <h3 className="text-lg font-bold text-green-900">Strategic Response Framework</h3>
+          <Shield className="w-6 h-6 text-indigo-600" />
+          <h3 className="text-lg font-bold text-indigo-900">Strategic Response Framework</h3>
         </div>
         <div className="grid gap-4">
           {aiAnalysis.recommendations.map((rec: string, index: number) => (
@@ -265,8 +266,8 @@ const RecommendationItem = ({ text, index }: { text: string; index: number }) =>
   const displayText = useTypewriter(text, 18);
   
   return (
-    <div className="flex items-start gap-4 p-4 bg-white rounded-lg border border-green-200 hover:shadow-md transition-all duration-200">
-      <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-bold mt-1">
+    <div className="flex items-start gap-4 p-4 bg-white rounded-lg border border-indigo-200 hover:shadow-md transition-all duration-200">
+      <span className="flex-shrink-0 w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold mt-1">
         {index + 1}
       </span>
       <span className="text-gray-800 leading-relaxed flex-1">{displayText}</span>
@@ -288,7 +289,7 @@ const InsightItem = ({ text }: { text: string }) => {
 
 // Typing animation hook
 const useTypewriter = (text: string, speed: number = 30) => {
-  const [displayText, setDisplayText] = useState('Okay');
+  const [displayText, setDisplayText] = useState('');
 
   useEffect(() => {
     setDisplayText('');
@@ -308,9 +309,9 @@ const useTypewriter = (text: string, speed: number = 30) => {
   return displayText;
 };
 
-const DiseasePredictionPage = () => {
+const InfluenzaPredictionPage = () => {
   const params = useParams();
-  const disease = params.disease as string || 'malaria';
+  const disease = 'influenza';
   
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
@@ -359,18 +360,18 @@ const DiseasePredictionPage = () => {
         return;
       }
       
-      // Filter files to only show those with "malaria" in the name (case insensitive)
-      const malariaFiles = files
+      // Filter files to only show those with "influenza" or "flu" in the name (case insensitive)
+      const influenzaFiles = files
         ?.filter(file => {
           const fileName = file.name.toLowerCase();
-          return fileName.includes('malaria') && fileName.endsWith('.csv');
+          return (fileName.includes('influenza') || fileName.includes('flu')) && fileName.endsWith('.csv');
         })
         .map(file => ({
           name: file.name,
           selected: false
         })) || [];
       
-      setUploadedFiles(malariaFiles);
+      setUploadedFiles(influenzaFiles);
     } catch (error) {
       console.error('Error loading files:', error);
     }
@@ -405,7 +406,7 @@ const DiseasePredictionPage = () => {
       const entry: any = {};
       headers.forEach((header, index) => {
         const value = values[index]?.trim() || '';
-        const numericFields = ['year', 'month', 'confirmed_cases', 'recoveries', 'deaths', 'hospitalizations'];
+        const numericFields = ['year', 'month', 'confirmed_cases', 'recoveries', 'deaths', 'hospitalizations', 'icu_admissions'];
         
         if (numericFields.includes(header)) {
           entry[header] = Number(value) || 0;
@@ -445,7 +446,7 @@ const DiseasePredictionPage = () => {
           const filteredRecords = records.filter((record: any) => {
             const recordYear = parseInt(record.year) || 0;
             const recordDisease = (record.disease || '').toLowerCase().trim();
-            const currentDisease = (disease || 'malaria').toLowerCase().trim();
+            const currentDisease = disease.toLowerCase().trim();
             
             return recordYear === 2025 && recordDisease === currentDisease;
           });
@@ -552,7 +553,7 @@ const DiseasePredictionPage = () => {
     
     if (lastMonth < 12) {
       const lastMonthData = monthlyData[lastMonth];
-      const avgGrowth = 0.15;
+      const avgGrowth = 0.16;
       
       const predictionData = {
         month: nextMonth,
@@ -609,16 +610,16 @@ const DiseasePredictionPage = () => {
       const lastMonth = months[months.length - 1];
       const lastMonthData = monthlyByProvince[province][lastMonth] || totals;
 
-      const avgGrowth = 0.15;
+      const avgGrowth = 0.16;
       const predicted_cases = Math.round(lastMonthData.confirmed_cases * (1 + avgGrowth));
       const current_cases = lastMonthData.confirmed_cases;
       const growth_rate = Math.round(((predicted_cases - current_cases) / Math.max(current_cases, 1)) * 100);
 
       let risk_level = 'Low';
-      if (predicted_cases > 1000) risk_level = 'High';
+      if (predicted_cases > 1200) risk_level = 'High';
       else if (predicted_cases > 500) risk_level = 'Medium';
 
-      const confidence = 80 + Math.floor(Math.random() * 15);
+      const confidence = 81 + Math.floor(Math.random() * 16);
 
       const provinceInfo = ZIMBABWE_PROVINCES.find(p => 
         p.name.toLowerCase() === province.toLowerCase()
@@ -717,7 +718,7 @@ const DiseasePredictionPage = () => {
     setCurrentAnalysisStep(0);
     
     try {
-      const analysis = await generateMalariaAnalysis(predictions, nationalPrediction);
+      const analysis = await generateInfluenzaAnalysis(predictions, nationalPrediction);
       setAiAnalysis(analysis);
       
       // Simulate step-by-step analysis
@@ -787,7 +788,7 @@ const DiseasePredictionPage = () => {
       <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 capitalize">{disease} Outbreak Predictions</h1>
+            <h1 className="text-2xl font-bold text-gray-900 capitalize">Influenza Outbreak Predictions</h1>
             <p className="text-gray-600">Monthly forecast and risk analysis for Zimbabwe</p>
           </div>
           <div className="hidden md:flex items-center gap-4">
@@ -795,8 +796,8 @@ const DiseasePredictionPage = () => {
               <Users className="w-4 h-4" />
               <span>{totalUsersCount} users in system</span>
             </div>
-            <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-green-400" />
+            <div className="flex items-center justify-center w-12 h-12 bg-sky-50 rounded-lg">
+              <TrendingUp className="w-6 h-6 text-sky-400" />
             </div>
           </div>
         </div>
@@ -813,8 +814,8 @@ const DiseasePredictionPage = () => {
                   {nationalPrediction.total_predicted_cases.toLocaleString()}
                 </p>
               </div>
-              <div className="flex items-center justify-center w-12 h-12 bg-blue-50 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-blue-400" />
+              <div className="flex items-center justify-center w-12 h-12 bg-sky-50 rounded-lg">
+                <TrendingUp className="w-6 h-6 text-sky-400" />
               </div>
             </div>
           </div>
@@ -867,8 +868,8 @@ const DiseasePredictionPage = () => {
       <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Select 2025 Malaria Datasets</h3>
-            <p className="text-gray-600 text-sm">Choose which uploaded malaria datasets to use for predictions</p>
+            <h3 className="text-lg font-semibold text-gray-900">Select 2025 Influenza Datasets</h3>
+            <p className="text-gray-600 text-sm">Choose which uploaded influenza datasets to use for predictions</p>
           </div>
           <div className="flex gap-3">
             <button
@@ -882,7 +883,7 @@ const DiseasePredictionPage = () => {
         </div>
 
         {/* Auto-Alerts Toggle */}
-        <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200 mb-6">
+        <div className="flex items-center gap-3 p-4 bg-sky-50 rounded-lg border border-sky-200 mb-6">
           <div className="flex items-center gap-3 flex-1">
             <div className="flex items-center gap-2">
               <input
@@ -890,18 +891,18 @@ const DiseasePredictionPage = () => {
                 id="auto-alerts"
                 checked={autoSendAlerts}
                 onChange={(e) => setAutoSendAlerts(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
               />
               <label htmlFor="auto-alerts" className="flex items-center gap-2 text-sm font-medium text-gray-700">
                 {autoSendAlerts ? (
-                  <Bell className="w-4 h-4 text-blue-500" />
+                  <Bell className="w-4 h-4 text-sky-500" />
                 ) : (
                   <BellOff className="w-4 h-4 text-gray-400" />
                 )}
                 Automatically send email alerts when predictions are generated
               </label>
             </div>
-            <div className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded">
+            <div className="text-sm text-sky-600 bg-sky-100 px-2 py-1 rounded">
               {totalUsersCount} users will be notified
             </div>
           </div>
@@ -926,7 +927,7 @@ const DiseasePredictionPage = () => {
                   </span>
                 </button>
                 <span className="text-gray-600 text-sm">
-                  {selectedFiles.length} of {uploadedFiles.length} malaria files selected
+                  {selectedFiles.length} of {uploadedFiles.length} influenza files selected
                 </span>
               </div>
               
@@ -1005,8 +1006,8 @@ const DiseasePredictionPage = () => {
         ) : (
           <div className="text-center py-8 text-gray-600 bg-gray-50 rounded-lg border border-gray-200">
             <Database className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p className="font-medium">No malaria datasets found</p>
-            <p className="text-sm mt-1">Upload CSV files with 'malaria' in the filename to get started</p>
+            <p className="font-medium">No influenza datasets found</p>
+            <p className="text-sm mt-1">Upload CSV files with 'influenza' or 'flu' in the filename to get started</p>
           </div>
         )}
       </div>
@@ -1029,11 +1030,11 @@ const DiseasePredictionPage = () => {
                   <Line 
                     type="monotone" 
                     dataKey="confirmed_cases" 
-                    stroke="#10B981" 
+                    stroke="#0EA5E9" 
                     strokeWidth={3}
                     name="Confirmed Cases"
-                    dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, fill: '#10B981' }}
+                    dot={{ fill: '#0EA5E9', strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, fill: '#0EA5E9' }}
                   />
                   <Line 
                     type="monotone" 
@@ -1185,7 +1186,7 @@ const DiseasePredictionPage = () => {
                     <Brain className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold">Malaria Outbreak Intelligence Analysis</h2>
+                    <h2 className="text-xl font-bold">Influenza Outbreak Intelligence Analysis</h2>
                     <p className="text-amber-100 text-sm mt-1">AI-powered epidemiological assessment & strategic recommendations</p>
                   </div>
                 </div>
@@ -1238,7 +1239,7 @@ const DiseasePredictionPage = () => {
               <div className="flex justify-between items-center text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <Brain className="w-4 h-4" />
-                  <span>Epidemiological AI Analysis • Malaria Outbreak Response System</span>
+                  <span>Epidemiological AI Analysis • Influenza Outbreak Response System</span>
                 </div>
                 <span>Generated: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</span>
               </div>
@@ -1250,4 +1251,4 @@ const DiseasePredictionPage = () => {
   );
 };
 
-export default DiseasePredictionPage;
+export default InfluenzaPredictionPage;
