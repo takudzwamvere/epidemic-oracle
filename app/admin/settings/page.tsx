@@ -69,7 +69,7 @@ const AdminSettings = () => {
       ...prev,
       [section]: {
         ...prev[section as keyof typeof prev],
-        [field]: !prev[section as keyof typeof prev][field as keyof typeof prev[typeof section]]
+        [field]: !(prev[section as keyof typeof prev] as any)[field]
       }
     }));
   };
