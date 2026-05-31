@@ -41,7 +41,7 @@ import { sendProvinceAlerts, getTotalUsersCount } from '@/lib/nodemailer-service
 // Initialize regular Supabase client (for file operations)
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)!
 );
 
 const MapComponent = dynamic(() => import('@/components/Map'), { ssr: false });
@@ -1066,7 +1066,7 @@ const InfluenzaPredictionPage = () => {
                     cx="50%"
                     cy="50%"
                     labelLine={true}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                     outerRadius={120}
                     fill="#8884d8"
                     dataKey="value"
@@ -1075,7 +1075,7 @@ const InfluenzaPredictionPage = () => {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => [value.toLocaleString(), 'Cases']} />
+                  <Tooltip formatter={(value) => [Number(value || 0).toLocaleString(), 'Cases']} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>

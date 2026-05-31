@@ -961,7 +961,7 @@ const PrivateDatasetUpload = () => {
                       <div className="flex justify-between">
                         <span className="text-gray-600">Status:</span>
                         <span className={`font-medium ${getStatusColor(uploadStatus[processedFile.originalName] || 'pending')}`}>
-                          {getStatusText(uploadStatus[processedFile.originalName] || 'pending', processedFile.qualityReport.metadata.diseaseType)}
+                          {getStatusText(uploadStatus[processedFile.originalName] || 'pending', processedFile.qualityReport.metadata.diseaseType || 'general')}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
