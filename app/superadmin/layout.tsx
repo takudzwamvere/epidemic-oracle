@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -76,7 +76,36 @@ export default function SuperAdminLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ username: string; email: string; role: string } | null>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            setCurrentUser(data.user);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch user session:', err);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const getInitials = (name: string) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const displayName = currentUser?.username || 'Super Admin';
+  const displayInitials = getInitials(displayName);
+  const displayRole = currentUser?.role === 'SUPERADMIN' ? 'Super Admin' : 'Administrator';
 
   const isActiveLink = (href: string) => {
     return pathname === href || pathname.startsWith(href);
@@ -188,16 +217,17 @@ export default function SuperAdminLayout({
               {/* User profile info */}
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-slate-200 flex items-center justify-center border border-slate-300">
-                  <span className="text-slate-600 text-xs font-bold">SA</span>
+                  <span className="text-slate-600 text-xs font-bold">{displayInitials}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-slate-900 text-sm font-medium truncate">Super Admin</div>
-                  <div className="text-slate-500 text-xs truncate">Administrator</div>
+                  <div className="text-slate-900 text-sm font-medium truncate">{displayName}</div>
+                  <div className="text-slate-500 text-xs truncate">{displayRole}</div>
                 </div>
               </div>
             </div>
           )}
         </div>
+
       </div>
 
       {/* ── MAIN CONTENT AREA ── */}
