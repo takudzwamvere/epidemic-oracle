@@ -48,7 +48,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         throw new Error(data.error || 'Failed to sign up')
       }
 
-      router.push('/auth/sign-up-success')
+      router.push('/admin')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
