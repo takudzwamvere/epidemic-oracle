@@ -40,7 +40,7 @@ import { sendProvinceAlerts, getTotalUsersCount } from '@/lib/nodemailer-service
 // Initialize regular Supabase client (for file operations)
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)!
 );
 
 const MapComponent = dynamic(() => import('@/components/Map'), { ssr: false });
