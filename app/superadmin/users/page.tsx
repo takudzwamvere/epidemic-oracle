@@ -1,13 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { Edit, Trash2, Plus, Save, X, User, Mail, MapPin, AlertCircle } from 'lucide-react';
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)!
-);
 
 interface User {
   id: string;
@@ -44,18 +37,14 @@ const UsersAdminPage = () => {
 
   const loadUsers = async () => {
     try {
-      console.log('Loading users from Supabase...');
+      console.log('Loading users from custom PostgreSQL API...');
       setDebugInfo('Fetching users...');
       
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const response = await fetch('/api/users');
+      const data = await response.json();
 
-      if (error) {
-        console.error('Supabase error:', error);
-        setDebugInfo(`Error: ${error.message} (${error.code})`);
-        throw error;
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load users');
       }
 
       console.log('Users loaded:', data);
@@ -77,28 +66,26 @@ const UsersAdminPage = () => {
   const handleSaveUser = async (user: User) => {
     try {
       setDebugInfo('Saving user...');
-      const { data, error } = await supabase
-        .from('users')
-        .update({
+      const response = await fetch(`/api/users/${user.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           username: user.username,
           email: user.email,
           province: user.province,
           is_active: user.is_active,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id)
-        .select();
+        }),
+      });
 
-      if (error) {
-        setDebugInfo(`Save error: ${error.message}`);
-        throw error;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update user');
       }
 
-      if (!data || data.length === 0) {
-        throw new Error('No data returned from update');
-      }
-
-      setUsers(users.map(u => u.id === user.id ? data[0] : u));
+      setUsers(users.map(u => u.id === user.id ? data : u));
       setEditingUser(null);
       setSaveStatus({ type: 'success', message: 'User updated successfully' });
       setDebugInfo('User saved successfully');
@@ -128,36 +115,26 @@ const UsersAdminPage = () => {
       setDebugInfo('Adding new user...');
       console.log('Adding user:', newUser);
 
-      const { data, error } = await supabase
-        .from('users')
-        .insert([{
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           username: newUser.username.trim(),
           email: newUser.email.trim(),
           province: newUser.province,
-          is_active: true
-        }])
-        .select();
+        }),
+      });
 
-      if (error) {
-        console.error('Supabase insert error:', error);
-        setDebugInfo(`Insert error: ${error.message} (${error.code})`);
-        
-        if (error.code === '23505') { // Unique violation
-          if (error.message.includes('username')) {
-            throw new Error('Username already exists');
-          } else if (error.message.includes('email')) {
-            throw new Error('Email already exists');
-          }
-        }
-        throw error;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to add user');
       }
 
-      if (!data || data.length === 0) {
-        throw new Error('No data returned from insert');
-      }
-
-      console.log('User added successfully:', data[0]);
-      setUsers([data[0], ...users]);
+      console.log('User added successfully:', data);
+      setUsers([data, ...users]);
       setNewUser({ username: '', email: '', province: 'Harare', is_active: true });
       setShowAddForm(false);
       setSaveStatus({ type: 'success', message: 'User added successfully' });
@@ -177,12 +154,15 @@ const UsersAdminPage = () => {
 
     try {
       setDebugInfo('Deleting user...');
-      const { error } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', userId);
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'DELETE',
+      });
 
-      if (error) throw error;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete user');
+      }
 
       setUsers(users.filter(u => u.id !== userId));
       setSaveStatus({ type: 'success', message: 'User deleted successfully' });

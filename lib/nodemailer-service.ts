@@ -1,13 +1,7 @@
 'use server';
 
-import { createClient } from '@supabase/supabase-js';
+import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)!
-);
 
 // Create transporter - USING NODEMAILER ONLY
 const createTransporter = () => {
@@ -36,13 +30,7 @@ export async function sendProvinceAlerts(predictions: any[], disease: string, na
     console.log('✅ SMTP connection verified');
 
     // Get ALL users from the table
-    const { data: users, error } = await supabase
-      .from('users')
-      .select('*');
-
-    if (error) {
-      throw new Error(`Failed to fetch users: ${error.message}`);
-    }
+    const users = await prisma.user.findMany();
 
     if (!users || users.length === 0) {
       return { 
@@ -342,12 +330,8 @@ Automated alert from Disease Prediction System
 // ADD THIS FUNCTION - IT WAS MISSING
 export async function getTotalUsersCount() {
   try {
-    const { data: users, error } = await supabase
-      .from('users')
-      .select('id');
-
-    if (error) throw error;
-    return { count: users?.length || 0, error: null };
+    const count = await prisma.user.count();
+    return { count, error: null };
   } catch (error: any) {
     return { count: 0, error: error.message };
   }

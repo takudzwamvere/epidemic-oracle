@@ -1,10 +1,5 @@
 // services/notificationService.ts
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)!
-);
+import { prisma } from '@/lib/prisma';
 
 export interface OutbreakNotification {
   id: string;
@@ -47,45 +42,43 @@ export class NotificationService {
   }
 
   static async getAllNotifications(): Promise<OutbreakNotification[]> {
-    const { data, error } = await supabase
-      .from('outbreak_notifications')
-      .select('*')
-      .order('timestamp', { ascending: false });
+    try {
+      const data = await prisma.outbreakNotification.findMany({
+        orderBy: { timestamp: 'desc' },
+      });
 
-    if (error) {
+      return data.map(notif => ({
+        ...notif,
+        risk_level: notif.risk_level as any,
+        urgency: notif.urgency as any,
+        timestamp: new Date(notif.timestamp)
+      }));
+    } catch (error) {
       console.error('Error fetching notifications:', error);
       return [];
     }
-
-    return data.map(notif => ({
-      ...notif,
-      timestamp: new Date(notif.timestamp)
-    }));
   }
 
   static async markAsRead(notificationId: string): Promise<void> {
-    const { error } = await supabase
-      .from('outbreak_notifications')
-      .update({ read: true })
-      .eq('id', notificationId);
-
-    if (error) {
+    try {
+      await prisma.outbreakNotification.update({
+        where: { id: notificationId },
+        data: { read: true },
+      });
+    } catch (error) {
       console.error('Error marking notification as read:', error);
     }
   }
 
   static async getUnreadCount(): Promise<number> {
-    const { count, error } = await supabase
-      .from('outbreak_notifications')
-      .select('*', { count: 'exact', head: true })
-      .eq('read', false);
-
-    if (error) {
+    try {
+      return await prisma.outbreakNotification.count({
+        where: { read: false },
+      });
+    } catch (error) {
       console.error('Error getting unread count:', error);
       return 0;
     }
-
-    return count || 0;
   }
 
   private static calculateExpectedPeak(prediction: any): string {
@@ -152,25 +145,25 @@ export class NotificationService {
   }
 
   private static async storeNotification(notification: OutbreakNotification): Promise<void> {
-    const { error } = await supabase
-      .from('outbreak_notifications')
-      .insert({
-        id: notification.id,
-        disease: notification.disease,
-        province: notification.province,
-        risk_level: notification.risk_level,
-        predicted_cases: notification.predicted_cases,
-        confidence: notification.confidence,
-        expected_peak: notification.expected_peak,
-        trigger_reason: notification.trigger_reason,
-        recommended_actions: notification.recommended_actions,
-        urgency: notification.urgency,
-        timestamp: notification.timestamp.toISOString(),
-        read: notification.read,
-        prediction_data: notification.prediction_data
+    try {
+      await prisma.outbreakNotification.create({
+        data: {
+          id: notification.id,
+          disease: notification.disease,
+          province: notification.province,
+          risk_level: notification.risk_level,
+          predicted_cases: notification.predicted_cases,
+          confidence: notification.confidence,
+          expected_peak: notification.expected_peak,
+          trigger_reason: notification.trigger_reason,
+          recommended_actions: notification.recommended_actions,
+          urgency: notification.urgency,
+          timestamp: notification.timestamp,
+          read: notification.read,
+          prediction_data: notification.prediction_data,
+        },
       });
-
-    if (error) {
+    } catch (error) {
       console.error('Failed to store notification:', error);
     }
   }

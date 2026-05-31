@@ -1,10 +1,5 @@
 // services/emailAlertService.ts
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)!
-);
+import { prisma } from '@/lib/prisma';
 
 export interface PredictionResult {
   province: string;
@@ -36,15 +31,9 @@ export interface EmailRecipient {
 export class EmailAlertService {
   static async getRecipients(): Promise<EmailRecipient[]> {
     try {
-      const { data, error } = await supabase
-        .from('alert_recipients')
-        .select('*')
-        .eq('is_active', true);
-
-      if (error) {
-        console.error('Error fetching recipients:', error);
-        return [];
-      }
+      const data = await prisma.alertRecipient.findMany({
+        where: { is_active: true },
+      });
 
       return data || [];
     } catch (error) {
