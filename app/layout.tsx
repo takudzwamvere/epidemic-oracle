@@ -19,11 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins} antialiased min-h-svh w-full flex flex-col items-center justify-between`}>
-        <section>
-          {children}
-        </section>
+      <body className={`${poppins.className} antialiased min-h-svh bg-gray-50`}>
+        {children}
       </body>
     </html>
   );
 }
+
