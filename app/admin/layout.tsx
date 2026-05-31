@@ -93,13 +93,7 @@ export default function AdminLayout({
       )}
 
       {/* Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-50
-        bg-white border-r border-gray-200 shadow-sm
-        transform transition-transform duration-300 ease-in-out
-        ${sidebarOpen ? 'w-64' : 'w-20'}
-        ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
+      <div className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 shadow-sm transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'w-64' : 'w-20'} ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         {/* Sidebar Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           {sidebarOpen && (
@@ -140,13 +134,7 @@ export default function AdminLayout({
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileSidebarOpen(false)}
-                className={`
-                  flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 group
-                  ${isActive 
-                    ? 'bg-green-50 text-green-600 border-l-2 border-green-400' 
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }
-                `}
+                className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 group ${isActive ? 'bg-green-50 text-green-600 border-l-2 border-green-400' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`}
               >
                 <div className={`
                   flex-shrink-0 transition-colors
@@ -209,10 +197,7 @@ export default function AdminLayout({
       </div>
 
       {/* Main Content */}
-      <div className={`
-        min-h-screen transition-all duration-300
-        ${sidebarOpen ? 'lg:pl-64' : 'lg:pl-20'}
-      `}>
+      <div className={`min-h-screen transition-all duration-300 ${sidebarOpen ? 'lg:pl-64' : 'lg:pl-20'}`}>
         {/* Top Bar */}
         <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
           <div className="flex items-center justify-between p-4">
