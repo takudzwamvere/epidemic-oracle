@@ -13,3 +13,46 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id           String   @id @default(uuid())
+  username     String
+  email        String   @unique
+  passwordHash String
+  province     String
+  is_active    Boolean  @default(true)
+  role         String   @default("USER")
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("users")
+}
+
+model OutbreakNotification {
+  id                  String   @id @default(uuid())
+  disease             String
+  province            String
+  risk_level          String
+  predicted_cases     Int
+  confidence          Float
+  expected_peak       String
+  trigger_reason      String
+  recommended_actions String[]
+  urgency             String
+  timestamp           DateTime @default(now())
+  read                Boolean  @default(false)
+  prediction_data     Json?
+
+  @@map("outbreak_notifications")
+}
+
+model AlertRecipient {
+  id        String  @id @default(uuid())
+  email     String  @unique
+  name      String
+  role      String
+  province  String
+  is_active Boolean @default(true)
+
+  @@map("alert_recipients")
+}
