@@ -351,7 +351,7 @@ const CovidPredictionPage = () => {
   const loadUploadedFiles = async () => {
     try {
       const { data: files, error } = await supabase.storage
-        .from('private-datasets')
+        .from('files')
         .list('submitted-datasets');
       
       if (error) {
@@ -431,7 +431,7 @@ const CovidPredictionPage = () => {
       for (const fileName of selectedFiles) {
         try {
           const { data: fileData, error } = await supabase.storage
-            .from('private-datasets')
+            .from('files')
             .download(`submitted-datasets/${fileName}`);
           
           if (error) {

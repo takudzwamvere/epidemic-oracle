@@ -53,7 +53,7 @@ const PrivateDatasetUpload = () => {
     try {
       // Try to list the bucket to check if it exists and is accessible
       const { data, error } = await supabase.storage
-        .from('private-datasets')
+        .from('files')
         .list('processed-datasets', {
           limit: 1
         });
@@ -83,7 +83,7 @@ const PrivateDatasetUpload = () => {
   const checkExistingFiles = async (): Promise<Set<string>> => {
     try {
       const { data: files, error } = await supabase.storage
-        .from('private-datasets')
+        .from('files')
         .list('processed-datasets');
 
       if (error) {
@@ -103,7 +103,7 @@ const PrivateDatasetUpload = () => {
   const checkContentDuplicates = async (contentHash: string, diseaseType: string): Promise<boolean> => {
     try {
       const { data: files } = await supabase.storage
-        .from('private-datasets')
+        .from('files')
         .list('processed-datasets', {
           limit: 100
         });
@@ -116,7 +116,7 @@ const PrivateDatasetUpload = () => {
       for (const file of diseaseFiles.slice(0, 3)) {
         try {
           const { data: fileContent } = await supabase.storage
-            .from('private-datasets')
+            .from('files')
             .download(`processed-datasets/${file.name}`);
 
           if (fileContent) {
@@ -549,7 +549,7 @@ const PrivateDatasetUpload = () => {
       const processedBlob = new Blob([processedData], { type: 'text/csv' });
       
       const { data: uploadData, error: processedError } = await supabase.storage
-        .from('private-datasets')
+        .from('files')
         .upload(`processed-datasets/${processedName}`, processedBlob, {
           cacheControl: '3600',
           upsert: true // This will overwrite if file exists
@@ -561,7 +561,7 @@ const PrivateDatasetUpload = () => {
         // Try alternative approach - maybe the folder doesn't exist
         // Let's try uploading to root first to test connectivity
         const testUpload = await supabase.storage
-          .from('private-datasets')
+          .from('files')
           .upload(`test_${Date.now()}.txt`, new Blob(['test']));
           
         console.log('Test upload result:', testUpload);
@@ -576,7 +576,7 @@ const PrivateDatasetUpload = () => {
       const reportFileName = `quality_report_${Date.now()}_${file.name.replace(/\.[^/.]+$/, '')}.json`;
       
       const { error: reportError } = await supabase.storage
-        .from('private-datasets')
+        .from('files')
         .upload(`quality-reports/${reportFileName}`, reportBlob);
 
       if (reportError) {
