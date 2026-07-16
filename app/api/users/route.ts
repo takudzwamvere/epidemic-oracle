@@ -8,6 +8,9 @@ export async function GET(request: Request) {
     if (!sessionUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    if (sessionUser.role !== 'SUPERADMIN') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     const users = await prisma.user.findMany({
       orderBy: { created_at: 'desc' },
@@ -28,6 +31,9 @@ export async function POST(request: Request) {
     const sessionUser = await getSessionUser(request as any);
     if (!sessionUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (sessionUser.role !== 'SUPERADMIN') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const { username, email, province } = await request.json();
