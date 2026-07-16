@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   BarChart3, 
   Settings, 
@@ -78,6 +78,7 @@ export default function SuperAdminLayout({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<{ username: string; email: string; role: string } | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -87,14 +88,22 @@ export default function SuperAdminLayout({
           const data = await res.json();
           if (data.user) {
             setCurrentUser(data.user);
+            if (data.user.role !== 'SUPERADMIN') {
+              router.push(data.user.role === 'ADMIN' ? '/admin' : '/protected');
+            }
+          } else {
+            router.push('/auth/login');
           }
+        } else {
+          router.push('/auth/login');
         }
       } catch (err) {
         console.error('Failed to fetch user session:', err);
+        router.push('/auth/login');
       }
     };
     fetchUser();
-  }, []);
+  }, [router]);
 
   const getInitials = (name: string) => {
     if (!name) return 'U';
@@ -105,7 +114,11 @@ export default function SuperAdminLayout({
 
   const displayName = currentUser?.username || 'Super Admin';
   const displayInitials = getInitials(displayName);
-  const displayRole = currentUser?.role === 'SUPERADMIN' ? 'Super Admin' : 'Administrator';
+  const displayRole = currentUser?.role === 'SUPERADMIN' 
+    ? 'Super Admin' 
+    : currentUser?.role === 'ADMIN' 
+    ? 'Administrator' 
+    : 'User';
 
   const isActiveLink = (href: string) => {
     return pathname === href || pathname.startsWith(href);
