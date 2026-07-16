@@ -11,6 +11,9 @@ export async function PATCH(
     if (!sessionUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    if (sessionUser.role !== 'SUPERADMIN') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     const { id } = await params;
     const body = await request.json();
@@ -43,6 +46,9 @@ export async function DELETE(
     const sessionUser = await getSessionUser(request as any);
     if (!sessionUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (sessionUser.role !== 'SUPERADMIN') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const { id } = await params;
