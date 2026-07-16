@@ -20,5 +20,33 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Role-based route authorization
+  if (user) {
+    const role = user.role || 'USER';
+
+    if (pathname.startsWith('/superadmin')) {
+      if (role !== 'SUPERADMIN') {
+        const url = request.nextUrl.clone();
+        url.pathname = role === 'ADMIN' ? '/admin' : '/protected';
+        return NextResponse.redirect(url);
+      }
+    }
+
+    if (pathname.startsWith('/admin')) {
+      if (role !== 'ADMIN' && role !== 'SUPERADMIN') {
+        const url = request.nextUrl.clone();
+        url.pathname = '/protected';
+        return NextResponse.redirect(url);
+      }
+    }
+
+    // Redirect logged-in users visiting auth pages to their land page
+    if (pathname === '/auth/login' || pathname === '/auth/sign-up') {
+      const url = request.nextUrl.clone();
+      url.pathname = role === 'SUPERADMIN' ? '/superadmin' : role === 'ADMIN' ? '/admin' : '/protected';
+      return NextResponse.redirect(url);
+    }
+  }
+
   return NextResponse.next()
 }
