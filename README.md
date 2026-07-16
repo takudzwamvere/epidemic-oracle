@@ -34,3 +34,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## 🛡️ Security Enhancements (July 2026)
+
+The following security and code quality improvements have been implemented:
+* **Role-Based Middleware Redirections:** Enforce strict access control, blocking non-superadmins from `/superadmin/*` routes and non-admins/non-superadmins from `/admin/*` routes.
+* **Backend API Route Hardening:** Restrict all CRUD endpoints under `/api/users` and `/api/users/[id]` exclusively to the `SUPERADMIN` role.
+* **Client-Side Layout Redirection Fallbacks:** Correctly display the user's role and handle redirect checks gracefully in `AdminLayout` and `SuperAdminLayout`.
+* **Pruning Unused Libraries & Files:** Removed obsolete Resend, simpleEmailService, and EmailJS integrations, along with pruning `@google/generative-ai` and `@emailjs/browser` packages.
+* **Refactored Code Duplication:** Centralized the `useTypewriter` hook into a common utility under `lib/hooks.ts` across 5 pages.
+
