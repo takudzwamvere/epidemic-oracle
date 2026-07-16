@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import { useTypewriter } from '@/lib/hooks';
 import { 
   LineChart, 
   Line, 
@@ -287,26 +288,6 @@ const InsightItem = ({ text }: { text: string }) => {
 };
 
 // Typing animation hook
-const useTypewriter = (text: string, speed: number = 30) => {
-  const [displayText, setDisplayText] = useState('Okay');
-
-  useEffect(() => {
-    setDisplayText('');
-    let i = 0;
-    const timer = setInterval(() => {
-      if (i < text.length) {
-        setDisplayText(text.slice(0, i + 1));
-        i++;
-      } else {
-        clearInterval(timer);
-      }
-    }, speed);
-
-    return () => clearInterval(timer);
-  }, [text, speed]);
-
-  return displayText;
-};
 
 const DiseasePredictionPage = () => {
   const params = useParams();
