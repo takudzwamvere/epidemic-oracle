@@ -43,4 +43,8 @@ The following security and code quality improvements have been implemented:
 * **Client-Side Layout Redirection Fallbacks:** Correctly display the user's role and handle redirect checks gracefully in `AdminLayout` and `SuperAdminLayout`.
 * **Pruning Unused Libraries & Files:** Removed obsolete Resend, simpleEmailService, and EmailJS integrations, along with pruning `@google/generative-ai` and `@emailjs/browser` packages.
 * **Refactored Code Duplication:** Centralized the `useTypewriter` hook into a common utility under `lib/hooks.ts` across 5 pages.
+* **Integrated Outbreak Alerts REST API:** Implemented endpoints `/api/notifications` and `/api/notifications/read` to retrieve and mark notifications as read without exposing server-only database operations.
+* **Client-Side Component Decoupling:** Refactored `NotificationBell` to load data asynchronously, resolving Next.js compilation errors.
+* **Layout & Dashboard Visual Polish:** Stylized landing page, dashboards, datasets management grid, user tables, and password forms with cohesive slate/blue color palettes, borders, and animations.
+
 

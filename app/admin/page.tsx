@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { BarChart3, Upload, Database, FileText, MapPin, TrendingUp, Activity } from 'lucide-react';
+import { BarChart3, Upload, Database, FileText, MapPin, TrendingUp, Activity, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const AdminDashboard = () => {
