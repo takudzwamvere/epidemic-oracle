@@ -16,6 +16,7 @@ import {
   Menu
 } from 'lucide-react';
 import { LogoutButton } from '@/components/logout-button';
+import NotificationBell from '@/components/NotificationBell';
 
 interface SidebarItem {
   name: string;
@@ -263,6 +264,7 @@ export default function AdminLayout({
 
             {/* Top-right actions */}
             <div className="flex items-center gap-4">
+              <NotificationBell />
               <button className="flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm font-medium">
                 <Settings className="w-4 h-4" />
                 <span className="hidden sm:inline">Settings</span>
