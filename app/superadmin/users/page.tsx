@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Edit, Trash2, Plus, Save, X, User, Mail, MapPin, AlertCircle } from 'lucide-react';
+import { Edit, Trash2, Plus, Save, X, User, Mail, MapPin, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface User {
   id: string;
@@ -100,7 +100,6 @@ const UsersAdminPage = () => {
   };
 
   const handleAddUser = async () => {
-    // Basic validation
     if (!newUser.username.trim() || !newUser.email.trim()) {
       setSaveStatus({ type: 'error', message: 'Username and email are required' });
       return;
@@ -182,7 +181,6 @@ const UsersAdminPage = () => {
     await handleSaveUser(updatedUser);
   };
 
-  // Reset form when closing
   const handleCancelAdd = () => {
     setNewUser({ username: '', email: '', province: 'Harare', is_active: true });
     setShowAddForm(false);
@@ -197,280 +195,278 @@ const UsersAdminPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading users...</p>
-          {debugInfo && <p className="text-sm text-gray-500 mt-2">{debugInfo}</p>}
+      <div className="min-h-[400px] flex items-center justify-center bg-slate-50">
+        <div className="text-center space-y-3">
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-blue-600 border-t-transparent mx-auto"></div>
+          <p className="text-slate-500 text-sm font-medium">Loading system officials...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-              <p className="text-gray-600 mt-2">Manage system users and their provinces</p>
-            </div>
+    <div className="space-y-6">
+      {/* Header card */}
+      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Official Alert Recipients</h1>
+            <p className="text-slate-500 text-sm mt-1">Manage health officials authorized to receive regional outbreak notifications</p>
+          </div>
+          <div className="flex gap-2">
             <button
               onClick={loadUsers}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium shadow-xs"
             >
+              <RefreshCw className="w-4 h-4" />
               Refresh
             </button>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors text-sm font-semibold shadow-xs"
+            >
+              <Plus className="w-4 h-4" />
+              Add Official
+            </button>
           </div>
-          
-          {/* Debug Info */}
-          {debugInfo && (
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center gap-2 text-sm text-blue-800">
-                <AlertCircle className="w-4 h-4" />
-                <span>Debug: {debugInfo}</span>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Status Message */}
-        {saveStatus && (
-          <div className={`mb-6 p-4 rounded-lg ${
-            saveStatus.type === 'success' 
-              ? 'bg-green-50 text-green-800 border border-green-200' 
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}>
-            <div className="flex items-center gap-2">
-              {saveStatus.type === 'success' ? (
-                <span>✅</span>
-              ) : (
-                <AlertCircle className="w-5 h-5" />
-              )}
-              <span>{saveStatus.message}</span>
-            </div>
+        {/* Debug block - formatted nicely */}
+        {debugInfo && (
+          <div className="mt-4 p-2 px-3 bg-slate-50 border border-slate-100 rounded-lg flex items-center gap-2 text-xs text-slate-500 font-mono">
+            <AlertCircle className="w-3.5 h-3.5 text-slate-400" />
+            <span>State: {debugInfo}</span>
           </div>
         )}
+      </div>
 
-        {/* Add User Button */}
-        <div className="mb-6">
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            Add New User
-          </button>
+      {/* Save Status alert popup */}
+      {saveStatus && (
+        <div className={`p-4 rounded-xl border ${
+          saveStatus.type === 'success' 
+            ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+            : 'bg-rose-50 text-rose-800 border-rose-200'
+        } transition-all duration-300`}>
+          <div className="flex items-center gap-2.5">
+            {saveStatus.type === 'success' ? (
+              <span className="text-emerald-600">✓</span>
+            ) : (
+              <AlertCircle className="w-5 h-5 text-rose-500" />
+            )}
+            <span className="text-sm font-medium">{saveStatus.message}</span>
+          </div>
         </div>
+      )}
 
-        {/* Add User Form */}
-        {showAddForm && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Add New User</h3>
-              <button
-                onClick={handleCancelAdd}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Username *
-                </label>
-                <input
-                  type="text"
-                  value={newUser.username}
-                  onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="Enter username"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  value={newUser.email}
-                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="Enter email"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Province
-                </label>
-                <select
-                  value={newUser.province}
-                  onChange={(e) => setNewUser({ ...newUser, province: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  {ZIMBABWE_PROVINCES.map(province => (
-                    <option key={province} value={province}>{province}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={handleCancelAdd}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddUser}
-                disabled={!newUser.username.trim() || !newUser.email.trim()}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Save className="w-4 h-4" />
-                Save User
-              </button>
-            </div>
+      {/* Add User Modal/Form card */}
+      {showAddForm && (
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-lg font-bold text-slate-900">Add Alert Recipient</h3>
+            <button
+              onClick={handleCancelAdd}
+              className="text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-        )}
-
-        {/* Users Table */}
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    User
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Province
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-green-100 rounded-full">
-                          <User className="w-5 h-5 text-green-600" />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {user.username}
-                            {editingUser?.id === user.id && <span className="ml-2 text-blue-600">(editing)</span>}
-                          </div>
-                          <div className="text-sm text-gray-500 flex items-center gap-1">
-                            <Mail className="w-3 h-3" />
-                            {user.email}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 flex items-center gap-1">
-                        <MapPin className="w-4 h-4 text-gray-400" />
-                        {editingUser?.id === user.id ? (
-                          <select
-                            value={editingUser.province}
-                            onChange={(e) => setEditingUser({ ...editingUser, province: e.target.value })}
-                            className="border border-gray-300 rounded px-2 py-1 text-sm"
-                          >
-                            {ZIMBABWE_PROVINCES.map(province => (
-                              <option key={province} value={province}>{province}</option>
-                            ))}
-                          </select>
-                        ) : (
-                          user.province
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() => toggleUserStatus(user)}
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                          user.is_active
-                            ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                        }`}
-                      >
-                        {user.is_active ? 'Active' : 'Inactive'}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end gap-2">
-                        {editingUser?.id === user.id ? (
-                          <>
-                            <button
-                              onClick={() => setEditingUser(null)}
-                              className="text-gray-500 hover:text-gray-700 p-1"
-                              title="Cancel"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleSaveUser(editingUser)}
-                              className="text-green-600 hover:text-green-800 p-1"
-                              title="Save"
-                            >
-                              <Save className="w-4 h-4" />
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => setEditingUser(user)}
-                              className="text-blue-600 hover:text-blue-800 p-1"
-                              title="Edit"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteUser(user.id)}
-                              className="text-red-600 hover:text-red-800 p-1"
-                              title="Delete"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Username *
+              </label>
+              <input
+                type="text"
+                value={newUser.username}
+                onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                placeholder="e.g. John Doe"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Email *
+              </label>
+              <input
+                type="email"
+                value={newUser.email}
+                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                placeholder="e.g. name@domain.gov"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Province Assignment
+              </label>
+              <select
+                value={newUser.province}
+                onChange={(e) => setNewUser({ ...newUser, province: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-200 bg-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              >
+                {ZIMBABWE_PROVINCES.map(province => (
+                  <option key={province} value={province}>{province}</option>
                 ))}
-              </tbody>
-            </table>
-          </div>
-
-          {users.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
-              <User className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p className="text-lg font-medium">No users found</p>
-              <p className="text-sm mt-1">Add your first user using the button above</p>
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                Add First User
-              </button>
+              </select>
             </div>
-          )}
+          </div>
+          <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
+            <button
+              onClick={handleCancelAdd}
+              className="px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleAddUser}
+              disabled={!newUser.username.trim() || !newUser.email.trim()}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition-colors"
+            >
+              <Save className="w-4 h-4" />
+              Save Recipient
+            </button>
+          </div>
         </div>
+      )}
+
+      {/* Users Table */}
+      <div className="bg-white shadow-xs rounded-xl border border-slate-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-slate-50">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Official Details
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Assigned Province
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Alert Status
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Date Added
+                </th>
+                <th className="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-slate-100">
+              {users.map((user) => (
+                <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0 h-9 w-9 flex items-center justify-center bg-blue-50 border border-blue-100 rounded-lg">
+                        <User className="w-4.5 h-4.5 text-blue-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
+                          {user.username}
+                          {editingUser?.id === user.id && (
+                            <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.2 rounded-full uppercase">
+                              Editing
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
+                          <Mail className="w-3.5 h-3.5 text-slate-400" />
+                          {user.email}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-slate-700 flex items-center gap-1.5">
+                      <MapPin className="w-4 h-4 text-slate-400" />
+                      {editingUser?.id === user.id ? (
+                        <select
+                          value={editingUser.province}
+                          onChange={(e) => setEditingUser({ ...editingUser, province: e.target.value })}
+                          className="border border-slate-200 bg-white rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                        >
+                          {ZIMBABWE_PROVINCES.map(province => (
+                            <option key={province} value={province}>{province}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        user.province
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={() => toggleUserStatus(user)}
+                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold transition-all ${
+                        user.is_active
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100'
+                          : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
+                      }`}
+                    >
+                      {user.is_active ? 'Active' : 'Inactive'}
+                    </button>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500">
+                    {new Date(user.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex justify-end gap-2.5">
+                      {editingUser?.id === user.id ? (
+                        <>
+                          <button
+                            onClick={() => setEditingUser(null)}
+                            className="text-slate-400 hover:text-slate-600 p-1 border border-transparent hover:bg-slate-100 rounded"
+                            title="Cancel"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleSaveUser(editingUser)}
+                            className="text-emerald-600 hover:text-emerald-800 p-1 border border-transparent hover:bg-emerald-50 rounded"
+                            title="Save"
+                          >
+                            <Save className="w-4 h-4" />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setEditingUser(user)}
+                            className="text-blue-600 hover:text-blue-800 p-1 border border-transparent hover:bg-blue-50 rounded"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="text-rose-600 hover:text-rose-800 p-1 border border-transparent hover:bg-rose-50 rounded"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {users.length === 0 && (
+          <div className="text-center py-16 text-slate-500">
+            <User className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+            <p className="text-base font-bold text-slate-900">No Officials Registered</p>
+            <p className="text-sm mt-1">Get started by creating your first official recipient.</p>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 font-semibold transition-colors text-sm shadow-xs"
+            >
+              Register First Official
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
