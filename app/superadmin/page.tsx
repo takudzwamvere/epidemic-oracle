@@ -6,7 +6,6 @@ import {
   Activity, 
   TrendingUp, 
   AlertTriangle, 
-  Users,
   Shield,
   Database
 } from 'lucide-react';
@@ -92,145 +91,143 @@ const SuperAdminDashboard = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'optimal': return 'text-green-400 bg-green-400/20';
-      case 'degraded': return 'text-yellow-400 bg-yellow-400/20';
-      case 'offline': return 'text-red-400 bg-red-400/20';
-      default: return 'text-gray-400 bg-gray-400/20';
+      case 'optimal': return 'text-emerald-700 bg-emerald-50 border-emerald-250';
+      case 'degraded': return 'text-amber-700 bg-amber-50 border-amber-250';
+      case 'offline': return 'text-rose-700 bg-rose-50 border-rose-250';
+      default: return 'text-slate-600 bg-slate-50 border-slate-200';
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <div className="flex items-center justify-between">
+      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Predictive Analytics Dashboard</h1>
-            <p className="text-gray-600">
-              Real-time disease outbreak predictions and model monitoring
+            <h1 className="text-2xl font-bold text-slate-900">Predictive Analytics Dashboard</h1>
+            <p className="text-slate-500 text-sm mt-1">
+              Real-time disease outbreak predictions and system-wide ML model monitoring
             </p>
           </div>
-          <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
-            <Shield className="w-5 h-5 text-green-400" />
-            <span className="text-green-600 text-sm font-medium">All Systems Operational</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg self-start sm:self-auto">
+            <Shield className="w-4 h-4 text-emerald-600" />
+            <span className="text-emerald-700 text-xs font-bold tracking-wide uppercase">All Systems Operational</span>
           </div>
         </div>
       </div>
 
       {/* System Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {systemStats.map((stat) => (
-          <div key={stat.name} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div key={stat.name} className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm font-medium">{stat.name}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                <p className="text-gray-400 text-xs mt-1">{stat.description}</p>
+                <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider">{stat.name}</p>
+                <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
+                <p className="text-slate-400 text-[10px] mt-1">{stat.description}</p>
               </div>
-              <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
-                <stat.icon className="w-6 h-6 text-green-400" />
+              <div className="w-10 h-10 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-center">
+                <stat.icon className="w-5 h-5 text-blue-600" />
               </div>
             </div>
-            <div className="flex items-center mt-4">
-              <span className={`text-xs font-medium ${
-                stat.changeType === 'positive' ? 'text-green-400' : 'text-red-400'
+            <div className="flex items-center mt-3 pt-3 border-t border-slate-50">
+              <span className={`text-xs font-semibold ${
+                stat.changeType === 'positive' ? 'text-emerald-600' : 'text-rose-600'
               }`}>
                 {stat.change}
               </span>
-              <span className="text-gray-400 text-xs ml-2">from last month</span>
+              <span className="text-slate-400 text-[10px] ml-2">from last month</span>
             </div>
           </div>
         ))}
       </div>
 
       {/* Disease Models */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Disease Prediction Models</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+        <h2 className="text-lg font-bold text-slate-900 mb-4">Disease Prediction Models</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {diseaseModels.map((model) => (
             <Link
               key={model.name}
               href={model.path}
-              className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
+              className="block p-5 bg-slate-50 hover:bg-slate-100/60 rounded-xl border border-slate-150 transition duration-150 hover:shadow-sm"
             >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-gray-900 font-semibold">{model.name}</h3>
-                <span className={`px-2 py-1 rounded text-xs font-bold ${getStatusColor(model.status)}`}>
-                  {model.status.charAt(0).toUpperCase() + model.status.slice(1)}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-slate-900 font-bold text-sm">{model.name}</h3>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${getStatusColor(model.status)}`}>
+                  {model.status}
                 </span>
               </div>
               
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-xs font-medium border-b border-slate-100 pb-3 mb-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Accuracy:</span>
-                  <span className="text-gray-900">{model.accuracy}%</span>
+                  <span className="text-slate-500">Accuracy:</span>
+                  <span className="text-slate-800 font-semibold">{model.accuracy}%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Last Training:</span>
-                  <span className="text-gray-900">{model.lastTraining}</span>
+                  <span className="text-slate-500">Last Training:</span>
+                  <span className="text-slate-800 font-semibold">{model.lastTraining}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Active Alerts:</span>
-                  <span className={`${model.alerts > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                  <span className="text-slate-500">Active Alerts:</span>
+                  <span className={`font-bold ${model.alerts > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                     {model.alerts}
                   </span>
                 </div>
               </div>
               
-              <div className="mt-3 pt-3 border-t border-gray-200">
-                <div className="text-green-600 text-sm font-medium flex items-center gap-1">
-                  <Activity className="w-4 h-4" />
-                  View Predictions →
-                </div>
+              <div className="text-blue-600 text-xs font-bold flex items-center gap-1">
+                <Activity className="w-3.5 h-3.5" />
+                View Predictions →
               </div>
             </Link>
           ))}
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Model Management</h3>
+      {/* Quick Actions & Recent alerts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+          <h3 className="text-lg font-bold text-slate-900 mb-4">Model Management</h3>
           <div className="space-y-3">
-            <button className="w-full text-left p-3 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-colors">
-              <div className="text-gray-900 font-medium">Retrain All Models</div>
-              <div className="text-gray-600 text-sm">Update models with latest data</div>
+            <button className="w-full text-left p-3.5 bg-blue-50/50 hover:bg-blue-50 border border-blue-150 rounded-lg transition-colors">
+              <div className="text-blue-900 text-sm font-semibold">Retrain All Models</div>
+              <div className="text-blue-700/80 text-xs mt-0.5">Force re-training across all 5 disease datasets</div>
             </button>
-            <button className="w-full text-left p-3 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg transition-colors">
-              <div className="text-gray-900 font-medium">Performance Report</div>
-              <div className="text-gray-600 text-sm">Generate model accuracy report</div>
+            <button className="w-full text-left p-3.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors">
+              <div className="text-slate-900 text-sm font-semibold">Performance Report</div>
+              <div className="text-slate-500 text-xs mt-0.5">Generate and download model quality report</div>
             </button>
-            <button className="w-full text-left p-3 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg transition-colors">
-              <div className="text-gray-900 font-medium">Alert Settings</div>
-              <div className="text-gray-600 text-sm">Configure prediction thresholds</div>
+            <button className="w-full text-left p-3.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors">
+              <div className="text-slate-900 text-sm font-semibold">Alert Settings</div>
+              <div className="text-slate-500 text-xs mt-0.5">Configure prediction and confidence thresholds</div>
             </button>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Predictions</h3>
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+          <h3 className="text-lg font-bold text-slate-900 mb-4">Recent Predictions</h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-lg">
               <div>
-                <div className="text-gray-900 font-medium">Malaria - Harare</div>
-                <div className="text-gray-600 text-sm">High risk predicted for February</div>
+                <div className="text-slate-800 text-sm font-semibold">Malaria - Harare</div>
+                <div className="text-slate-500 text-xs mt-0.5">High risk predicted for February</div>
               </div>
-              <span className="text-red-400 text-sm font-medium">+42%</span>
+              <span className="text-rose-600 text-xs font-bold bg-rose-50 px-2.5 py-1 rounded-full border border-rose-100">+42%</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-lg">
               <div>
-                <div className="text-gray-900 font-medium">Cholera - Manicaland</div>
-                <div className="text-gray-600 text-sm">Moderate outbreak likely</div>
+                <div className="text-slate-800 text-sm font-semibold">Cholera - Manicaland</div>
+                <div className="text-slate-500 text-xs mt-0.5">Moderate outbreak likely</div>
               </div>
-              <span className="text-yellow-400 text-sm font-medium">+18%</span>
+              <span className="text-amber-600 text-xs font-bold bg-amber-50 px-2.5 py-1 rounded-full border border-amber-100">+18%</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-lg">
               <div>
-                <div className="text-gray-900 font-medium">Influenza - Bulawayo</div>
-                <div className="text-gray-600 text-sm">Seasonal increase expected</div>
+                <div className="text-slate-800 text-sm font-semibold">Influenza - Bulawayo</div>
+                <div className="text-slate-500 text-xs mt-0.5">Seasonal increase expected</div>
               </div>
-              <span className="text-green-400 text-sm font-medium">+8%</span>
+              <span className="text-emerald-600 text-xs font-bold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">+8%</span>
             </div>
           </div>
         </div>

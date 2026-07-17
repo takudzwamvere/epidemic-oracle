@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 const AdminDashboard = () => {
   const router = useRouter();
 
-  // Mock data for a single health admin
   const adminStats = [
     {
       name: 'My Datasets',
@@ -83,7 +82,7 @@ const AdminDashboard = () => {
   const locationData = {
     healthFacilities: 12,
     population: 350000,
-    lastOutbreak: 'None detected'
+    lastOutbreak: 'No active outbreaks'
   };
 
   const getActivityIcon = (type: string) => {
@@ -96,20 +95,20 @@ const AdminDashboard = () => {
 
   const getActivityColor = (type: string) => {
     switch (type) {
-      case 'upload': return 'text-blue-400';
-      case 'download': return 'text-green-400';
-      default: return 'text-gray-400';
+      case 'upload': return 'text-blue-500';
+      case 'download': return 'text-indigo-500';
+      default: return 'text-slate-500';
     }
   };
 
   const getQualityColor = (quality: string) => {
     switch (quality) {
-      case 'A': return 'text-green-400';
-      case 'B': return 'text-blue-400';
-      case 'C': return 'text-yellow-400';
-      case 'D': return 'text-orange-400';
-      case 'F': return 'text-red-400';
-      default: return 'text-gray-400';
+      case 'A': return 'text-emerald-700 bg-emerald-50 border-emerald-200';
+      case 'B': return 'text-blue-700 bg-blue-50 border-blue-200';
+      case 'C': return 'text-amber-700 bg-amber-50 border-amber-200';
+      case 'D': return 'text-orange-700 bg-orange-50 border-orange-200';
+      case 'F': return 'text-rose-700 bg-rose-50 border-rose-200';
+      default: return 'text-slate-600 bg-slate-50 border-slate-200';
     }
   };
 
@@ -120,190 +119,166 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
         <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="flex items-center gap-2 text-green-600">
-                <MapPin className="w-5 h-5" />
-                <span className="font-semibold">Health District</span>
-              </div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-blue-600 text-xs font-bold uppercase tracking-wider">
+              <MapPin className="w-4 h-4" />
+              <span>District Health Board</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, Health Administrator</h1>
-            <p className="text-gray-600">
-              Monitoring health data for your district. {locationData.lastOutbreak}.
+            <h1 className="text-2xl font-bold text-slate-900">Welcome, Health Administrator</h1>
+            <p className="text-slate-500 text-sm">
+              Real-time monitoring system. Status: <span className="font-semibold text-emerald-600">{locationData.lastOutbreak}</span>.
             </p>
           </div>
-          <div className="hidden md:flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
-            <BarChart3 className="w-6 h-6 text-green-400" />
+          <div className="hidden md:flex items-center justify-center w-12 h-12 bg-blue-50 border border-blue-100 rounded-lg">
+            <BarChart3 className="w-6 h-6 text-blue-600" />
           </div>
         </div>
       </div>
 
       {/* Location Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm">Health Facilities</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{locationData.healthFacilities}</p>
+              <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Facilities</p>
+              <p className="text-2xl font-bold text-slate-900 mt-1">{locationData.healthFacilities}</p>
             </div>
-            <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
-              <Activity className="w-6 h-6 text-green-400" />
+            <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center">
+              <Activity className="w-5 h-5 text-slate-500" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm">Population</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{(locationData.population / 1000).toFixed(0)}K</p>
+              <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider">District Population</p>
+              <p className="text-2xl font-bold text-slate-900 mt-1">{(locationData.population / 1000).toFixed(0)}K</p>
             </div>
-            <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-green-400" />
+            <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-slate-500" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm">Outbreak Status</p>
-              <p className="text-2xl font-bold text-green-400 mt-1">Clear</p>
+              <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Outbreaks</p>
+              <p className="text-2xl font-bold text-emerald-600 mt-1">0 Active</p>
             </div>
-            <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
-              <FileText className="w-6 h-6 text-green-400" />
+            <div className="w-10 h-10 bg-emerald-50 border border-emerald-100 rounded-lg flex items-center justify-center">
+              <CheckCircle className="w-5 h-5 text-emerald-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm">Last Report</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">3 days</p>
+              <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider">Last Audit</p>
+              <p className="text-2xl font-bold text-slate-900 mt-1">3 days ago</p>
             </div>
-            <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
-              <Database className="w-6 h-6 text-green-400" />
+            <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center">
+              <Database className="w-5 h-5 text-slate-500" />
             </div>
           </div>
         </div>
       </div>
 
-      {/* My Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {adminStats.map((stat) => (
-          <div key={stat.name} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div key={stat.name} className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm font-medium">{stat.name}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                <p className="text-gray-400 text-xs mt-1">{stat.description}</p>
+                <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider">{stat.name}</p>
+                <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
+                <p className="text-slate-400 text-[10px] mt-1">{stat.description}</p>
               </div>
-              <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
-                <stat.icon className="w-6 h-6 text-green-400" />
+              <div className="w-10 h-10 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-center">
+                <stat.icon className="w-5 h-5 text-blue-600" />
               </div>
             </div>
-            <div className="flex items-center mt-4">
-              <span className={`text-xs font-medium ${
-                stat.changeType === 'positive' ? 'text-green-400' : 'text-red-400'
-              }`}>
+            <div className="flex items-center mt-3 pt-3 border-t border-slate-50">
+              <span className="text-xs font-semibold text-emerald-600">
                 {stat.change}
               </span>
-              <span className="text-gray-400 text-xs ml-2">this week</span>
+              <span className="text-slate-400 text-[10px] ml-2">from last week</span>
             </div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* My Recent Activity */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">My Recent Activity</h2>
-          <div className="space-y-4">
+        {/* Recent Activity */}
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+          <h2 className="text-lg font-bold text-slate-900 mb-4">My Recent Activity</h2>
+          <div className="space-y-3.5">
             {myRecentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={activity.id} className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className={`flex-shrink-0 ${getActivityColor(activity.type)}`}>
+                  <div className={`w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center ${getActivityColor(activity.type)}`}>
                     {getActivityIcon(activity.type)}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 text-sm">
-                      <span className="text-gray-500">You </span>
-                      <span className="text-gray-500">{activity.action} </span>
-                      <span className="font-medium truncate">{activity.target}</span>
+                  <div>
+                    <p className="text-slate-800 text-xs font-medium">
+                      <span>You </span>
+                      <span className="text-slate-500">{activity.action} </span>
+                      <span className="font-semibold">{activity.target}</span>
                     </p>
-                    <p className="text-gray-400 text-xs mt-1">{activity.time}</p>
+                    <p className="text-slate-400 text-[10px] mt-0.5">{activity.time}</p>
                   </div>
                 </div>
                 {activity.quality && (
-                  <div className={`px-2 py-1 rounded text-xs font-bold ${getQualityColor(activity.quality)} bg-white`}>
-                    {activity.quality}
-                  </div>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getQualityColor(activity.quality)}`}>
+                    Grade {activity.quality}
+                  </span>
                 )}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Data Management</h2>
+        {/* Action Panel */}
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+          <h2 className="text-lg font-bold text-slate-900 mb-4">Core Actions</h2>
           <div className="space-y-3">
             <button 
               onClick={() => handleNavigation('/admin/upload')}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-green-400 hover:bg-green-500 text-white rounded-lg transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors text-sm font-semibold shadow-xs"
             >
-              <Upload className="w-5 h-5" />
-              <span>Upload New Health Data</span>
+              <Upload className="w-4 h-4" />
+              <span>Upload Health Dataset</span>
             </button>
             <button 
               onClick={() => handleNavigation('/admin/datasets')}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg transition-colors text-sm font-semibold shadow-xs"
             >
-              <Database className="w-5 h-5" />
-              <span>View My Datasets</span>
+              <Database className="w-4 h-4" />
+              <span>Audit Datasets</span>
             </button>
             <button 
               onClick={() => handleNavigation('/admin/reports')}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg transition-colors text-sm font-semibold shadow-xs"
             >
-              <FileText className="w-5 h-5" />
+              <FileText className="w-4 h-4" />
               <span>Quality Reports</span>
             </button>
           </div>
 
-          {/* Data Format Support */}
-          <div className="mt-6 pt-4 border-t border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-600 mb-3">Supported Formats</h3>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="text-center p-2 bg-gray-50 rounded text-gray-700">CSV</div>
-              <div className="text-center p-2 bg-gray-50 rounded text-gray-700">JSON</div>
-              <div className="text-center p-2 bg-gray-50 rounded text-gray-700">XML</div>
-              <div className="text-center p-2 bg-gray-50 rounded text-gray-700">HL7</div>
-              <div className="text-center p-2 bg-gray-50 rounded text-gray-700">Excel</div>
-              <div className="text-center p-2 bg-gray-50 rounded text-gray-400">+ More</div>
+          {/* Formats info */}
+          <div className="mt-6 pt-5 border-t border-slate-100">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Supported Document Formats</h3>
+            <div className="grid grid-cols-5 gap-2 text-center text-[10px] font-semibold">
+              <div className="p-1.5 bg-slate-50 border border-slate-150 rounded text-slate-600">CSV</div>
+              <div className="p-1.5 bg-slate-50 border border-slate-150 rounded text-slate-600">JSON</div>
+              <div className="p-1.5 bg-slate-50 border border-slate-150 rounded text-slate-600">XML</div>
+              <div className="p-1.5 bg-slate-50 border border-slate-150 rounded text-slate-600">HL7</div>
+              <div className="p-1.5 bg-slate-50 border border-slate-150 rounded text-slate-600">XLSX</div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* District Health Status */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">District Health Overview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="text-green-600 text-2xl font-bold">12</div>
-            <div className="text-gray-600 text-sm">Active Facilities</div>
-          </div>
-          <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="text-green-600 text-2xl font-bold">8</div>
-            <div className="text-gray-600 text-sm">Datasets Submitted</div>
-          </div>
-          <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div className="text-green-600 text-2xl font-bold">84%</div>
-            <div className="text-gray-600 text-sm">Data Quality Score</div>
           </div>
         </div>
       </div>
