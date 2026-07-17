@@ -2,7 +2,21 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Bell, AlertTriangle, CheckCircle, X } from 'lucide-react';
-import { NotificationService, OutbreakNotification } from '@/services/notificationService';
+
+export interface OutbreakNotification {
+  id: string;
+  disease: string;
+  province: string;
+  risk_level: 'High' | 'Medium' | 'Low';
+  predicted_cases: number;
+  confidence: number;
+  expected_peak: string;
+  trigger_reason: string;
+  recommended_actions: string[];
+  urgency: 'critical' | 'high' | 'medium';
+  timestamp: string;
+  read: boolean;
+}
 
 interface NotificationBellProps {
   onNotificationClick?: (notification: OutbreakNotification) => void;
@@ -16,17 +30,19 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
 
   useEffect(() => {
     loadNotifications();
-    // Refresh every 30 seconds for new notifications
-    const interval = setInterval(loadNotifications, 30000);
+    const interval = setInterval(loadNotifications, 20000);
     return () => clearInterval(interval);
   }, []);
 
   const loadNotifications = async () => {
     setLoading(true);
     try {
-      const allNotifications = await NotificationService.getAllNotifications();
-      setNotifications(allNotifications);
-      setUnreadCount(allNotifications.filter(n => !n.read).length);
+      const res = await fetch('/api/notifications');
+      if (res.ok) {
+        const allNotifications = await res.json();
+        setNotifications(allNotifications);
+        setUnreadCount(allNotifications.filter((n: any) => !n.read).length);
+      }
     } catch (error) {
       console.error('Error loading notifications:', error);
     } finally {
@@ -35,32 +51,61 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
   };
 
   const handleMarkAsRead = async (notificationId: string) => {
-    await NotificationService.markAsRead(notificationId);
-    loadNotifications(); // Reload to update counts
+    try {
+      const res = await fetch('/api/notifications/read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: notificationId }),
+      });
+      if (res.ok) {
+        // Optimistic update
+        setNotifications(prev =>
+          prev.map(n => (n.id === notificationId ? { ...n, read: true } : n))
+        );
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    } catch (error) {
+      console.error('Error marking as read:', error);
+    }
   };
 
   const handleMarkAllAsRead = async () => {
-    const unreadNotifications = notifications.filter(n => !n.read);
-    for (const notification of unreadNotifications) {
-      await NotificationService.markAsRead(notification.id);
+    try {
+      const res = await fetch('/api/notifications/read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ all: true }),
+      });
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        setUnreadCount(0);
+      }
+    } catch (error) {
+      console.error('Error marking all as read:', error);
     }
-    loadNotifications();
   };
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case 'critical': return 'text-red-400 bg-red-500/20 border-red-500/30';
-      case 'high': return 'text-orange-400 bg-orange-500/20 border-orange-500/30';
-      case 'medium': return 'text-yellow-400 bg-yellow-500/20 border-yellow-500/30';
-      default: return 'text-blue-400 bg-blue-500/20 border-blue-500/30';
+      case 'critical':
+        return 'text-red-600 bg-red-50 border-red-200';
+      case 'high':
+        return 'text-orange-600 bg-orange-50 border-orange-200';
+      case 'medium':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      default:
+        return 'text-blue-600 bg-blue-50 border-blue-200';
     }
   };
 
   const getRiskIcon = (riskLevel: string) => {
     switch (riskLevel) {
-      case 'High': return <AlertTriangle className="w-4 h-4 text-red-400" />;
-      case 'Medium': return <AlertTriangle className="w-4 h-4 text-yellow-400" />;
-      default: return <AlertTriangle className="w-4 h-4 text-blue-400" />;
+      case 'High':
+        return <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />;
+      case 'Medium':
+        return <AlertTriangle className="w-4 h-4 text-yellow-500 flex-shrink-0" />;
+      default:
+        return <AlertTriangle className="w-4 h-4 text-blue-500 flex-shrink-0" />;
     }
   };
 
@@ -69,11 +114,11 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
       {/* Notification Bell */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-blue-200 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+        className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all duration-150"
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full">
+          <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 bg-red-600 text-white text-[10px] font-bold rounded-full animate-bounce">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -81,22 +126,22 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
 
       {/* Notification Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-12 w-96 bg-slate-800 border border-blue-500/20 rounded-lg shadow-xl z-50">
-          <div className="p-4 border-b border-blue-500/20">
+        <div className="absolute right-0 top-11 w-96 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-slate-100">
+          <div className="p-4 bg-slate-50">
             <div className="flex items-center justify-between">
-              <h3 className="text-white font-semibold">Outbreak Alerts</h3>
-              <div className="flex gap-2">
+              <h3 className="text-slate-900 font-semibold text-sm">Outbreak Alerts</h3>
+              <div className="flex gap-3">
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllAsRead}
-                    className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+                    className="text-blue-600 hover:text-blue-700 text-xs font-semibold transition-colors"
                   >
                     Mark all read
                   </button>
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -104,22 +149,22 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
             </div>
           </div>
 
-          <div className="max-h-96 overflow-y-auto">
-            {loading ? (
-              <div className="p-4 text-center text-blue-200/60">
+          <div className="max-h-96 overflow-y-auto divide-y divide-slate-100">
+            {loading && notifications.length === 0 ? (
+              <div className="p-6 text-center text-slate-500 text-sm">
                 Loading notifications...
               </div>
             ) : notifications.length === 0 ? (
-              <div className="p-6 text-center text-blue-200/60">
-                <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p>No outbreak alerts</p>
+              <div className="p-8 text-center text-slate-500">
+                <Bell className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                <p className="text-sm">No outbreak alerts found</p>
               </div>
             ) : (
               notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-4 border-b border-blue-500/10 cursor-pointer transition-colors hover:bg-white/5 ${
-                    !notification.read ? 'bg-blue-500/5' : ''
+                  className={`p-4 cursor-pointer transition-colors hover:bg-slate-50 flex gap-3 ${
+                    !notification.read ? 'bg-blue-50/30' : ''
                   }`}
                   onClick={() => {
                     handleMarkAsRead(notification.id);
@@ -127,45 +172,45 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
                     setIsOpen(false);
                   }}
                 >
-                  <div className="flex items-start gap-3">
-                    {getRiskIcon(notification.risk_level)}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-white font-semibold text-sm">
-                          {notification.disease} in {notification.province}
-                        </span>
-                        <span className={`px-2 py-1 rounded text-xs border ${getUrgencyColor(notification.urgency)}`}>
-                          {notification.risk_level} Risk
-                        </span>
-                      </div>
-                      
-                      <p className="text-blue-200/80 text-sm mb-2">
-                        {notification.trigger_reason}
-                      </p>
-                      
-                      <div className="text-blue-200/60 text-xs space-y-1">
-                        <div>🔼 {notification.predicted_cases.toLocaleString()} predicted cases</div>
-                        <div>📊 {notification.confidence}% confidence</div>
-                        <div>📅 Expected peak: {notification.expected_peak}</div>
-                      </div>
-
-                      <div className="mt-2">
-                        <p className="text-green-400 text-xs font-semibold mb-1">Recommended:</p>
-                        <ul className="text-blue-200/70 text-xs space-y-1">
-                          {notification.recommended_actions.slice(0, 2).map((action, index) => (
-                            <li key={index}>• {action}</li>
-                          ))}
-                          {notification.recommended_actions.length > 2 && (
-                            <li className="text-blue-400">+{notification.recommended_actions.length - 2} more actions</li>
-                          )}
-                        </ul>
-                      </div>
+                  {getRiskIcon(notification.risk_level)}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1 gap-2">
+                      <span className="text-slate-900 font-bold text-xs truncate">
+                        {notification.disease} in {notification.province}
+                      </span>
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${getUrgencyColor(notification.urgency)}`}>
+                        {notification.risk_level}
+                      </span>
                     </div>
                     
-                    {!notification.read && (
-                      <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0 mt-2"></div>
-                    )}
+                    <p className="text-slate-600 text-xs mb-2 leading-relaxed">
+                      {notification.trigger_reason}
+                    </p>
+                    
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-slate-500 text-[10px] font-medium bg-slate-50 p-2 rounded-lg mb-2">
+                      <div>🔼 {notification.predicted_cases.toLocaleString()} cases</div>
+                      <div>📊 {notification.confidence}% confidence</div>
+                      <div className="col-span-2">📅 Expected peak: {notification.expected_peak}</div>
+                    </div>
+
+                    <div>
+                      <p className="text-emerald-700 text-[10px] font-bold uppercase tracking-wider mb-1">Recommended Actions:</p>
+                      <ul className="text-slate-600 text-xs space-y-1 pl-2 list-disc">
+                        {notification.recommended_actions.slice(0, 2).map((action, index) => (
+                          <li key={index} className="truncate">{action}</li>
+                        ))}
+                        {notification.recommended_actions.length > 2 && (
+                          <li className="text-blue-600 list-none font-semibold text-[10px] mt-0.5">
+                            +{notification.recommended_actions.length - 2} more actions
+                          </li>
+                        )}
+                      </ul>
+                    </div>
                   </div>
+                  
+                  {!notification.read && (
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0 mt-1.5"></div>
+                  )}
                 </div>
               ))
             )}
