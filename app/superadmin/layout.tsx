@@ -16,6 +16,7 @@ import {
   Database
 } from 'lucide-react';
 import { LogoutButton } from '@/components/logout-button';
+import NotificationBell from '@/components/NotificationBell';
 
 interface SidebarItem {
   name: string;
@@ -274,6 +275,7 @@ export default function SuperAdminLayout({
 
             {/* Top-right actions */}
             <div className="flex items-center gap-4">
+              <NotificationBell />
               <LogoutButton />
             </div>
           </div>
