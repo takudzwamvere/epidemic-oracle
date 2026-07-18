@@ -29,17 +29,26 @@ export async function createSessionToken(user: { id: string; email: string; role
     .sign(JWT_SECRET);
 }
 
-export async function verifySessionToken(token: string): Promise<any> {
+export interface SessionUser {
+  id: string;
+  email: string;
+  role: string;
+  username: string;
+  province: string;
+}
+
+export async function verifySessionToken(token: string): Promise<SessionUser | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload;
-  } catch (error) {
+    return payload as unknown as SessionUser;
+  } catch {
     return null;
   }
 }
 
-export async function getSessionUser(request: NextRequest): Promise<any> {
-  const token = request.cookies.get('session')?.value;
+export async function getSessionUser(request: Request | NextRequest): Promise<SessionUser | null> {
+  const nextReq = request as NextRequest;
+  const token = nextReq.cookies?.get?.('session')?.value;
   if (!token) return null;
   return await verifySessionToken(token);
 }
