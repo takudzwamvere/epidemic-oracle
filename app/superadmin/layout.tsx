@@ -122,7 +122,10 @@ export default function SuperAdminLayout({
     : 'User';
 
   const isActiveLink = (href: string) => {
-    return pathname === href || pathname.startsWith(href);
+    if (href === '/superadmin') {
+      return pathname === '/superadmin';
+    }
+    return pathname.startsWith(href);
   };
 
   return (
@@ -139,26 +142,26 @@ export default function SuperAdminLayout({
       <div 
         className={`
           fixed inset-y-0 left-0 z-50
-          bg-slate-50 border-r border-slate-200
+          bg-slate-50 border-r border-slate-200/80
           transform transition-transform duration-300 ease-in-out
           ${sidebarOpen ? 'w-64' : 'w-16'}
           ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
         {/* Sidebar Header — Logo + App Name */}
-        <div className="flex items-center justify-between h-14 px-4 border-b border-slate-200 bg-white">
+        <div className="flex items-center justify-between h-14 px-4 border-b border-slate-200 bg-white shadow-xs">
           {sidebarOpen && (
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-blue-600 flex items-center justify-center">
+              <div className="w-6 h-6 bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center rounded">
                 <Shield className="w-4 h-4 text-white" />
               </div>
-              <span className="text-slate-900 font-bold text-sm tracking-tight">
+              <span className="text-slate-900 font-extrabold text-xs tracking-wider">
                 SUPERADMIN
               </span>
             </div>
           )}
           {!sidebarOpen && (
-            <div className="w-6 h-6 bg-blue-600 flex items-center justify-center mx-auto">
+            <div className="w-6 h-6 bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center mx-auto rounded">
               <Shield className="w-4 h-4 text-white" />
             </div>
           )}
@@ -166,7 +169,7 @@ export default function SuperAdminLayout({
           {sidebarOpen && (
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:flex hidden items-center justify-center text-slate-400 hover:text-slate-600"
+              className="lg:flex hidden items-center justify-center text-slate-400 hover:text-slate-600 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -184,14 +187,14 @@ export default function SuperAdminLayout({
                     href={item.href}
                     onClick={() => setMobileSidebarOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-3 transition-colors duration-150 relative
+                      flex items-center gap-3 px-4 py-3 transition-all duration-200 relative
                       ${isActive 
-                        ? 'bg-white text-blue-700 font-medium border-r-2 border-blue-600' 
+                        ? 'bg-white text-blue-700 font-semibold border-r-2 border-blue-600 shadow-xs' 
                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                       }
                     `}
                   >
-                    <div className={`flex-shrink-0 ${isActive ? 'text-blue-600' : 'text-slate-400'}`}>
+                    <div className={`flex-shrink-0 transition-colors ${isActive ? 'text-blue-600' : 'text-slate-400'}`}>
                       {item.icon}
                     </div>
                     {sidebarOpen && (
