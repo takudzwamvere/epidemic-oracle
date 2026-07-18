@@ -4,7 +4,7 @@ import { NotificationService } from '@/services/notificationService';
 
 export async function POST(request: Request) {
   try {
-    const sessionUser = await getSessionUser(request as any);
+    const sessionUser = await getSessionUser(request);
     if (!sessionUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -29,10 +29,11 @@ export async function POST(request: Request) {
 
     await NotificationService.markAsRead(id);
     return NextResponse.json({ message: `Notification ${id} marked as read` });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : 'Internal Server Error';
     console.error('Error marking notifications as read API:', error);
     return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
+      { error: errMsg },
       { status: 500 }
     );
   }

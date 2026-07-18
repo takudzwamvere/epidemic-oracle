@@ -1,20 +1,21 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth';
-import { NotificationService } from '@/services/notificationService';
+import { NotificationService, PredictionInput } from '@/services/notificationService';
 
 export async function GET(request: Request) {
   try {
-    const sessionUser = await getSessionUser(request as any);
+    const sessionUser = await getSessionUser(request);
     if (!sessionUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const notifications = await NotificationService.getAllNotifications();
     return NextResponse.json(notifications);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : 'Internal Server Error';
     console.error('Error fetching notifications API:', error);
     return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
+      { error: errMsg },
       { status: 500 }
     );
   }
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const sessionUser = await getSessionUser(request as any);
+    const sessionUser = await getSessionUser(request);
     if (!sessionUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const prediction = await request.json();
+    const prediction = await request.json() as PredictionInput;
     if (!prediction || !prediction.disease || !prediction.province) {
       return NextResponse.json(
         { error: 'Invalid prediction parameters' },
@@ -40,10 +41,11 @@ export async function POST(request: Request) {
 
     const notification = await NotificationService.createOutbreakNotification(prediction);
     return NextResponse.json(notification, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : 'Internal Server Error';
     console.error('Error creating notification API:', error);
     return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
+      { error: errMsg },
       { status: 500 }
     );
   }
