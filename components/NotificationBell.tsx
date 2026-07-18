@@ -1,7 +1,7 @@
 // components/NotificationBell.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Bell, AlertTriangle, CheckCircle, X } from 'lucide-react';
+import { Bell, AlertTriangle, X } from 'lucide-react';
 
 export interface OutbreakNotification {
   id: string;
@@ -41,7 +41,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
       if (res.ok) {
         const allNotifications = await res.json();
         setNotifications(allNotifications);
-        setUnreadCount(allNotifications.filter((n: any) => !n.read).length);
+        setUnreadCount(allNotifications.filter((n: OutbreakNotification) => !n.read).length);
       }
     } catch (error) {
       console.error('Error loading notifications:', error);
