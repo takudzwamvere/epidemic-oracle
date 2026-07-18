@@ -150,7 +150,7 @@ const SuperAdminDashboard = () => {
             <Link
               key={model.name}
               href={model.path}
-              className="block p-5 bg-slate-50 hover:bg-slate-100/60 rounded-xl border border-slate-150 transition duration-150 hover:shadow-sm"
+              className="block p-5 bg-slate-50/50 hover:bg-white rounded-xl border border-slate-150 hover:border-blue-500/30 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-slate-900 font-bold text-sm">{model.name}</h3>

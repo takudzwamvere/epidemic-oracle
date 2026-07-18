@@ -51,13 +51,14 @@ const UsersAdminPage = () => {
       setDebugInfo(`Found ${data?.length || 0} users`);
       setUsers(data || []);
       
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error loading users:', error);
       setSaveStatus({ 
         type: 'error', 
-        message: `Failed to load users: ${error.message}` 
+        message: `Failed to load users: ${errMsg}` 
       });
-      setDebugInfo(`Load error: ${error.message}`);
+      setDebugInfo(`Load error: ${errMsg}`);
     } finally {
       setLoading(false);
     }
@@ -90,11 +91,12 @@ const UsersAdminPage = () => {
       setSaveStatus({ type: 'success', message: 'User updated successfully' });
       setDebugInfo('User saved successfully');
       
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error updating user:', error);
       setSaveStatus({ 
         type: 'error', 
-        message: `Failed to update user: ${error.message}` 
+        message: `Failed to update user: ${errMsg}` 
       });
     }
   };
@@ -139,11 +141,12 @@ const UsersAdminPage = () => {
       setSaveStatus({ type: 'success', message: 'User added successfully' });
       setDebugInfo('User added successfully');
       
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : 'Failed to add user';
       console.error('Error adding user:', error);
       setSaveStatus({ 
         type: 'error', 
-        message: error.message || 'Failed to add user' 
+        message: errMsg 
       });
     }
   };
@@ -167,11 +170,12 @@ const UsersAdminPage = () => {
       setSaveStatus({ type: 'success', message: 'User deleted successfully' });
       setDebugInfo('User deleted successfully');
       
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error deleting user:', error);
       setSaveStatus({ 
         type: 'error', 
-        message: `Failed to delete user: ${error.message}` 
+        message: `Failed to delete user: ${errMsg}` 
       });
     }
   };
