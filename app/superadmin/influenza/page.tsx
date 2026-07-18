@@ -988,7 +988,7 @@ const InfluenzaPredictionPage = () => {
           <div className="text-center py-8 text-gray-600 bg-gray-50 rounded-lg border border-gray-200">
             <Database className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p className="font-medium">No influenza datasets found</p>
-            <p className="text-sm mt-1">Upload CSV files with 'influenza' or 'flu' in the filename to get started</p>
+            <p className="text-sm mt-1">Upload CSV files with &apos;influenza&apos; or &apos;flu&apos; in the filename to get started</p>
           </div>
         )}
       </div>

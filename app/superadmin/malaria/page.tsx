@@ -987,7 +987,7 @@ const DiseasePredictionPage = () => {
           <div className="text-center py-8 text-gray-600 bg-gray-50 rounded-lg border border-gray-200">
             <Database className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p className="font-medium">No malaria datasets found</p>
-            <p className="text-sm mt-1">Upload CSV files with 'malaria' in the filename to get started</p>
+            <p className="text-sm mt-1">Upload CSV files with &apos;malaria&apos; in the filename to get started</p>
           </div>
         )}
       </div>
