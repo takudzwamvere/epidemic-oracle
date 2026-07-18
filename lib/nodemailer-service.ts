@@ -2,6 +2,22 @@
 
 import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
+import { User } from '@prisma/client';
+
+export interface PredictionPayload {
+  province: string;
+  risk_level: string;
+  predicted_cases?: number;
+  current_cases?: number;
+  growth_rate?: string;
+}
+
+export interface NationalPrediction {
+  total_predicted_cases?: number;
+  average_risk?: string;
+  high_risk_provinces?: string[];
+  overall_confidence?: number;
+}
 
 // Create transporter - USING NODEMAILER ONLY
 const createTransporter = () => {
@@ -16,7 +32,7 @@ const createTransporter = () => {
   });
 };
 
-export async function sendProvinceAlerts(predictions: any[], disease: string, nationalPrediction: any) {
+export async function sendProvinceAlerts(predictions: PredictionPayload[], disease: string, nationalPrediction: NationalPrediction) {
   let transporter;
   
   try {
@@ -54,17 +70,14 @@ export async function sendProvinceAlerts(predictions: any[], disease: string, na
           p => p.province.toLowerCase() === user.province.toLowerCase()
         );
 
-        const highRiskProvinces = predictions.filter((p: any) => p.risk_level === 'High');
-        const mediumRiskProvinces = predictions.filter((p: any) => p.risk_level === 'Medium');
+        const highRiskProvinces = predictions.filter((p: PredictionPayload) => p.risk_level === 'High');
+        const mediumRiskProvinces = predictions.filter((p: PredictionPayload) => p.risk_level === 'Medium');
 
         const { html, text, subject } = generateEmailContent(
           user,
           userProvincePrediction,
           disease,
-          nationalPrediction,
-          highRiskProvinces,
-          mediumRiskProvinces,
-          predictions.length
+          nationalPrediction
         );
 
         const mailOptions = {
@@ -83,10 +96,11 @@ export async function sendProvinceAlerts(predictions: any[], disease: string, na
         // Small delay to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 500));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errMsg = error instanceof Error ? error.message : 'Unknown SMTP error';
         console.error(`❌ Failed to send alert to ${user.email}:`, error);
         errorCount++;
-        errors.push(`${user.email}: ${error.message}`);
+        errors.push(`${user.email}: ${errMsg}`);
       }
     }
 
@@ -106,11 +120,12 @@ export async function sendProvinceAlerts(predictions: any[], disease: string, na
       errors: errors.length > 0 ? errors : undefined
     };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : 'Unknown SMTP error';
     console.error('❌ Email alert sending failed:', error);
     return { 
       success: false, 
-      message: `Failed to send email alerts: ${error.message}`,
+      message: `Failed to send email alerts: ${errMsg}`,
       sentCount: 0,
       errorCount: 0,
       totalUsers: 0
@@ -124,13 +139,10 @@ export async function sendProvinceAlerts(predictions: any[], disease: string, na
 }
 
 function generateEmailContent(
-  user: any,
-  userProvincePrediction: any,
+  user: User,
+  userProvincePrediction: PredictionPayload | undefined,
   disease: string,
-  nationalPrediction: any,
-  highRiskProvinces: any[],
-  mediumRiskProvinces: any[],
-  totalProvinces: number
+  nationalPrediction: NationalPrediction
 ) {
   const diseaseName = disease.charAt(0).toUpperCase() + disease.slice(1);
   const currentDate = new Date().toLocaleDateString('en-US', { 
@@ -332,7 +344,8 @@ export async function getTotalUsersCount() {
   try {
     const count = await prisma.user.count();
     return { count, error: null };
-  } catch (error: any) {
-    return { count: 0, error: error.message };
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : 'Unknown database error';
+    return { count: 0, error: errMsg };
   }
 }
