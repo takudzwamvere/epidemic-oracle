@@ -1,6 +1,15 @@
 // services/notificationService.ts
 import { prisma } from '@/lib/prisma';
 
+export interface PredictionInput {
+  disease: string;
+  province: string;
+  risk_level: 'High' | 'Medium' | 'Low';
+  predicted_cases: number;
+  confirmed_cases: number;
+  confidence: number;
+}
+
 export interface OutbreakNotification {
   id: string;
   disease: string;
@@ -14,11 +23,11 @@ export interface OutbreakNotification {
   urgency: 'critical' | 'high' | 'medium';
   timestamp: Date;
   read: boolean;
-  prediction_data: any;
+  prediction_data: unknown;
 }
 
 export class NotificationService {
-  static async createOutbreakNotification(prediction: any): Promise<OutbreakNotification> {
+  static async createOutbreakNotification(prediction: PredictionInput): Promise<OutbreakNotification> {
     const notification: OutbreakNotification = {
       id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       disease: prediction.disease,
@@ -26,7 +35,7 @@ export class NotificationService {
       risk_level: prediction.risk_level,
       predicted_cases: prediction.predicted_cases,
       confidence: prediction.confidence,
-      expected_peak: this.calculateExpectedPeak(prediction),
+      expected_peak: this.calculateExpectedPeak(),
       trigger_reason: this.getTriggerReason(prediction),
       recommended_actions: this.generateRecommendedActions(prediction),
       urgency: prediction.risk_level === 'High' ? 'critical' : prediction.risk_level === 'Medium' ? 'high' : 'medium',
@@ -49,9 +58,10 @@ export class NotificationService {
 
       return data.map(notif => ({
         ...notif,
-        risk_level: notif.risk_level as any,
-        urgency: notif.urgency as any,
-        timestamp: new Date(notif.timestamp)
+        risk_level: notif.risk_level as 'High' | 'Medium' | 'Low',
+        urgency: notif.urgency as 'critical' | 'high' | 'medium',
+        timestamp: new Date(notif.timestamp),
+        prediction_data: notif.prediction_data || null
       }));
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -81,14 +91,14 @@ export class NotificationService {
     }
   }
 
-  private static calculateExpectedPeak(prediction: any): string {
+  private static calculateExpectedPeak(): string {
     const currentMonth = new Date().getMonth() + 1;
     const peakMonth = (currentMonth % 12) + 1;
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return `${monthNames[peakMonth - 1]} 2025`;
   }
 
-  private static getTriggerReason(prediction: any): string {
+  private static getTriggerReason(prediction: PredictionInput): string {
     const increase = ((prediction.predicted_cases - prediction.confirmed_cases) / prediction.confirmed_cases) * 100;
     
     if (increase > 50) return `Extreme case surge predicted: +${increase.toFixed(1)}%`;
@@ -97,7 +107,7 @@ export class NotificationService {
     return `Slight case increase: +${increase.toFixed(1)}%`;
   }
 
-  private static generateRecommendedActions(prediction: any): string[] {
+  private static generateRecommendedActions(prediction: PredictionInput): string[] {
     const baseActions = [
       'Increase surveillance and testing in affected areas',
       'Alert local healthcare facilities',
@@ -160,7 +170,7 @@ export class NotificationService {
           urgency: notification.urgency,
           timestamp: notification.timestamp,
           read: notification.read,
-          prediction_data: notification.prediction_data,
+          prediction_data: notification.prediction_data as any,
         },
       });
     } catch (error) {
