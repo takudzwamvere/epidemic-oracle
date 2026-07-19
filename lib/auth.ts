@@ -6,6 +6,11 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'fallback-super-secret-key-32-chars-long-epidemic-prediction'
 );
 
+/**
+ * Hashes a plaintext password using bcrypt.
+ * @param password The plaintext password to hash.
+ * @returns A promise resolving to the password hash.
+ */
 export async function hashPassword(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(10);
   return await bcrypt.hash(password, salt);
