@@ -98,6 +98,9 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
     }
   };
 
+  /**
+   * Marks all notifications as read in both local state and database.
+   */
   const handleMarkAllAsRead = async () => {
     try {
       const res = await fetch('/api/notifications/read', {
