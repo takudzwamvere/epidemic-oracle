@@ -28,6 +28,10 @@ interface NotificationBellProps {
   onNotificationClick?: (notification: OutbreakNotification) => void;
 }
 
+/**
+ * NotificationBell: Displays a bell icon with unread count and a dropdown listing alerts.
+ * Features an automatic fetch interval and click-outside closing behavior.
+ */
 const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick }) => {
   const [notifications, setNotifications] = useState<OutbreakNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
