@@ -25,6 +25,10 @@ export async function GET(request: Request) {
   }
 }
 
+/**
+ * POST handler to manually trigger/create a new outbreak notification.
+ * Restricted to ADMIN and SUPERADMIN users.
+ */
 export async function POST(request: Request) {
   try {
     const sessionUser = await getSessionUser(request);
