@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth';
 import { NotificationService } from '@/services/notificationService';
 
+/**
+ * POST handler to mark specific or all notifications as read.
+ * Requires an authenticated user session.
+ */
 export async function POST(request: Request) {
   try {
     const sessionUser = await getSessionUser(request);
