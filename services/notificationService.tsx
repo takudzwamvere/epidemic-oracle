@@ -136,6 +136,9 @@ export class NotificationService {
     return `Slight case increase: +${increase.toFixed(1)}%`;
   }
 
+  /**
+   * Compiles recommended health responses specific to the disease and input.
+   */
   private static generateRecommendedActions(prediction: PredictionInput): string[] {
     const baseActions = [
       'Increase surveillance and testing in affected areas',
