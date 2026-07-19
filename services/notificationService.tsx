@@ -124,6 +124,9 @@ export class NotificationService {
     return `${monthNames[peakMonth]} ${peakYear}`;
   }
 
+  /**
+   * Formulates a descriptive reason string based on case increase percentage.
+   */
   private static getTriggerReason(prediction: PredictionInput): string {
     const increase = ((prediction.predicted_cases - prediction.confirmed_cases) / prediction.confirmed_cases) * 100;
     
