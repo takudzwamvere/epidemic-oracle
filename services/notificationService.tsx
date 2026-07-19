@@ -97,6 +97,9 @@ export class NotificationService {
     }
   }
 
+  /**
+   * Counts the total number of unread notifications in the database.
+   */
   static async getUnreadCount(): Promise<number> {
     try {
       return await prisma.outbreakNotification.count({
