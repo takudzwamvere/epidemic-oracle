@@ -57,6 +57,9 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
     };
   }, []);
 
+  /**
+   * Queries the API for current notifications list and updates local state.
+   */
   const loadNotifications = async () => {
     setLoading(true);
     try {
