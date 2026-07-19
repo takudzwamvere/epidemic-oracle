@@ -60,6 +60,9 @@ export class NotificationService {
     return notification;
   }
 
+  /**
+   * Fetches all outbreak notifications sorted by newest first.
+   */
   static async getAllNotifications(): Promise<OutbreakNotification[]> {
     try {
       const data = await prisma.outbreakNotification.findMany({
