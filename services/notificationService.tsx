@@ -92,10 +92,13 @@ export class NotificationService {
   }
 
   private static calculateExpectedPeak(): string {
-    const currentMonth = new Date().getMonth() + 1;
-    const peakMonth = (currentMonth % 12) + 1;
+    const now = new Date();
+    const currentMonth = now.getMonth(); // 0-indexed: 0-11
+    const peakMonth = (currentMonth + 1) % 12; // 0-indexed: 0-11
+    const currentYear = now.getFullYear();
+    const peakYear = peakMonth < currentMonth ? currentYear + 1 : currentYear;
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return `${monthNames[peakMonth - 1]} 2025`;
+    return `${monthNames[peakMonth]} ${peakYear}`;
   }
 
   private static getTriggerReason(prediction: PredictionInput): string {
