@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell, AlertTriangle, X } from 'lucide-react';
 
+/**
+ * Local representation of the OutbreakNotification structure.
+ */
 export interface OutbreakNotification {
   id: string;
   disease: string;
