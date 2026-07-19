@@ -1,6 +1,6 @@
 // components/NotificationBell.tsx
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Bell, AlertTriangle, X } from 'lucide-react';
 
 export interface OutbreakNotification {
@@ -27,11 +27,24 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadNotifications();
     const interval = setInterval(loadNotifications, 20000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const loadNotifications = async () => {
@@ -110,7 +123,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       {/* Notification Bell */}
       <button
         onClick={() => setIsOpen(!isOpen)}
