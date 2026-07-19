@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, getSessionUser } from '@/lib/auth';
 
+/**
+ * GET handler to retrieve all users.
+ * Accessible only by SUPERADMIN users.
+ */
 export async function GET(request: Request) {
   try {
     const sessionUser = await getSessionUser(request);
