@@ -21,6 +21,9 @@ export interface OutbreakNotification {
   read: boolean;
 }
 
+/**
+ * Props definition for the NotificationBell component.
+ */
 interface NotificationBellProps {
   onNotificationClick?: (notification: OutbreakNotification) => void;
 }
