@@ -67,6 +67,11 @@ export async function verifySessionToken(token: string): Promise<SessionUser | n
   }
 }
 
+/**
+ * Retrieves the session user from the request's cookies.
+ * @param request The incoming request object.
+ * @returns A promise resolving to the SessionUser, or null if not authenticated.
+ */
 export async function getSessionUser(request: Request | NextRequest): Promise<SessionUser | null> {
   const nextReq = request as NextRequest;
   const token = nextReq.cookies?.get?.('session')?.value;
