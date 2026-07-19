@@ -30,6 +30,10 @@ export async function GET(request: Request) {
   }
 }
 
+/**
+ * POST handler to create a new user.
+ * Accessible only by SUPERADMIN users.
+ */
 export async function POST(request: Request) {
   try {
     const sessionUser = await getSessionUser(request);
