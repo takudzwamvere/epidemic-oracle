@@ -33,6 +33,10 @@ export interface OutbreakNotification {
 }
 
 export class NotificationService {
+  /**
+   * Generates, stores, and returns a new outbreak notification.
+   * @param prediction The input prediction dataset values.
+   */
   static async createOutbreakNotification(prediction: PredictionInput): Promise<OutbreakNotification> {
     const notification: OutbreakNotification = {
       id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
