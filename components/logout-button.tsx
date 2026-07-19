@@ -5,6 +5,10 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { LogOut, Loader2 } from 'lucide-react';
 
+/**
+ * LogoutButton Component: Renders a button that clears the user session and routes to login.
+ * Displays a loading state during the logout process.
+ */
 export function LogoutButton() {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
