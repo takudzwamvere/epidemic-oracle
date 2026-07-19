@@ -4,7 +4,7 @@ import { hashPassword, getSessionUser } from '@/lib/auth';
 
 export async function GET(request: Request) {
   try {
-    const sessionUser = await getSessionUser(request as any);
+    const sessionUser = await getSessionUser(request);
     if (!sessionUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
