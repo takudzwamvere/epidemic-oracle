@@ -76,6 +76,9 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
     }
   };
 
+  /**
+   * Sends read status update to the server for a specific notification ID.
+   */
   const handleMarkAsRead = async (notificationId: string) => {
     try {
       const res = await fetch('/api/notifications/read', {
