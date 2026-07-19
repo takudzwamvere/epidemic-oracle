@@ -16,6 +16,12 @@ export async function hashPassword(password: string): Promise<string> {
   return await bcrypt.hash(password, salt);
 }
 
+/**
+ * Verifies a plaintext password against a bcrypt hash.
+ * @param password The plaintext password to check.
+ * @param hash The stored hash to verify against.
+ * @returns A promise resolving to true if matching, false otherwise.
+ */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   return await bcrypt.compare(password, hash);
 }
