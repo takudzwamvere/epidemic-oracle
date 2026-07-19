@@ -82,6 +82,10 @@ export class NotificationService {
     }
   }
 
+  /**
+   * Marks a specific notification as read in the database.
+   * @param notificationId ID of the notification to update.
+   */
   static async markAsRead(notificationId: string): Promise<void> {
     try {
       await prisma.outbreakNotification.update({
