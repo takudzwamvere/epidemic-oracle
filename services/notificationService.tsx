@@ -186,6 +186,9 @@ export class NotificationService {
     ];
   }
 
+  /**
+   * Helper method to insert the generated notification record into Prisma database.
+   */
   private static async storeNotification(notification: OutbreakNotification): Promise<void> {
     try {
       await prisma.outbreakNotification.create({
