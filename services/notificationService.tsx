@@ -111,6 +111,9 @@ export class NotificationService {
     }
   }
 
+  /**
+   * Calculates the predicted peak month and year dynamically.
+   */
   private static calculateExpectedPeak(): string {
     const now = new Date();
     const currentMonth = now.getMonth(); // 0-indexed: 0-11
