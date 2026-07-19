@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth';
 import { NotificationService, PredictionInput } from '@/services/notificationService';
 
+/**
+ * GET handler to fetch all outbreak notifications.
+ * Requires an authenticated user session.
+ */
 export async function GET(request: Request) {
   try {
     const sessionUser = await getSessionUser(request);
