@@ -53,6 +53,11 @@ export interface SessionUser {
   province: string;
 }
 
+/**
+ * Verifies and decodes a JWT session token.
+ * @param token The signed JWT session token.
+ * @returns The decoded SessionUser payload, or null if invalid.
+ */
 export async function verifySessionToken(token: string): Promise<SessionUser | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
