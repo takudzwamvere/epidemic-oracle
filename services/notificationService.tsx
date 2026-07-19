@@ -13,6 +13,9 @@ export interface PredictionInput {
   confidence: number;
 }
 
+/**
+ * Structure of an outbreak alert notification stored and displayed.
+ */
 export interface OutbreakNotification {
   id: string;
   disease: string;
