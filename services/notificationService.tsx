@@ -1,6 +1,9 @@
 // services/notificationService.ts
 import { prisma } from '@/lib/prisma';
 
+/**
+ * Parameters required to process and trigger an outbreak notification.
+ */
 export interface PredictionInput {
   disease: string;
   province: string;
