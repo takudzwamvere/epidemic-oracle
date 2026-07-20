@@ -15,6 +15,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+/**
+ * LoginForm functional component rendering the user authentication login form.
+ * @param className Optional container styling class.
+ * @param props Additional div element attributes.
+ */
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
