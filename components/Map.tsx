@@ -27,6 +27,9 @@ interface Prediction {
   trend: string;
 }
 
+/**
+ * Props for the Map component containing epidemic predictions.
+ */
 interface MapProps {
   predictions: Prediction[];
 }
