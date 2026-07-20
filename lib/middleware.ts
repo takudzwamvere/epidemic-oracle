@@ -1,6 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { verifySessionToken } from './auth'
 
+/**
+ * Middleware function to verify user session token and enforce role-based route authorization.
+ * @param request The incoming Next.js HTTP request object.
+ * @returns Response object redirecting or passing through request.
+ */
 export async function updateSession(request: NextRequest) {
   const sessionToken = request.cookies.get('session')?.value
   const user = sessionToken ? await verifySessionToken(sessionToken) : null
