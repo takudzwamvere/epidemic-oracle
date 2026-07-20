@@ -34,6 +34,9 @@ interface MapProps {
   predictions: Prediction[];
 }
 
+/**
+ * Interactive Leaflet map component rendering risk circles and statistics for epidemic predictions across provinces.
+ */
 const Map: React.FC<MapProps> = ({ predictions = [] }) => {
   // Fallback center (Zimbabwe)
   const center: [number, number] = [-19.0154, 29.1549];
