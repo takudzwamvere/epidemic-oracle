@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, createSessionToken } from '@/lib/auth';
 
+/**
+ * POST endpoint for handling user registration, password hashing, and session cookie creation.
+ */
 export async function POST(request: Request) {
   try {
     const { email, password, username, province } = await request.json();
