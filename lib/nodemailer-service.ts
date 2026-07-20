@@ -340,6 +340,10 @@ Automated alert from Disease Prediction System
 }
 
 // ADD THIS FUNCTION - IT WAS MISSING
+/**
+ * Retrieves the total user count from the database using Prisma.
+ * @returns Object containing user count or database error message.
+ */
 export async function getTotalUsersCount() {
   try {
     const count = await prisma.user.count();
