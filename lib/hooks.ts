@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
 
+/**
+ * Custom hook to produce a typewriter typing effect for a given text.
+ * @param text The text string to animate.
+ * @param speed Typing delay in milliseconds per character.
+ * @returns The current typed substring.
+ */
 export const useTypewriter = (text: string, speed: number = 30) => {
   const [displayText, setDisplayText] = useState('');
 
