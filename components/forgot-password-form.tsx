@@ -16,6 +16,11 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { KeyRound, Mail, ArrowLeft } from 'lucide-react';
 
+/**
+ * ForgotPasswordForm component rendering the password recovery request UI.
+ * @param className Optional container styling class.
+ * @param props Additional div element attributes.
+ */
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
