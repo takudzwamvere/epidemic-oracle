@@ -15,6 +15,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+/**
+ * SignUpForm functional component rendering the account registration form.
+ * @param className Optional container styling class.
+ * @param props Additional div element attributes.
+ */
 export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
