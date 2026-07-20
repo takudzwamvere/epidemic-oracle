@@ -16,6 +16,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ShieldAlert, CheckCircle2 } from 'lucide-react';
 
+/**
+ * UpdatePasswordForm component rendering the password update input UI.
+ * @param className Optional container styling class.
+ * @param props Additional div element attributes.
+ */
 export function UpdatePasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
