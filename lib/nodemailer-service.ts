@@ -38,6 +38,13 @@ const createTransporter = () => {
   });
 };
 
+/**
+ * Sends email alert notifications to users based on province predictions and national stats.
+ * @param predictions Array of province-level prediction payloads.
+ * @param disease Name of the disease outbreak.
+ * @param nationalPrediction Aggregated national prediction data.
+ * @returns Summary object detailing total users, sent count, and error count.
+ */
 export async function sendProvinceAlerts(predictions: PredictionPayload[], disease: string, nationalPrediction: NationalPrediction) {
   let transporter;
   
