@@ -36,6 +36,9 @@ const buttonVariants = cva(
   }
 )
 
+/**
+ * Reusable Button UI component supporting multiple variants, sizes, and polymorphic rendering via Radix Slot.
+ */
 function Button({
   className,
   variant,
