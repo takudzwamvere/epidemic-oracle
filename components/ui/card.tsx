@@ -73,6 +73,9 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * Main body content container for cards.
+ */
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
