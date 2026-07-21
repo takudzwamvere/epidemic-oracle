@@ -2,6 +2,9 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Outer container component for card UI elements.
+ */
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
