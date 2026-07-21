@@ -2,6 +2,9 @@ import { ArrowRight } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Animated button component featuring interactive hover expansion and directional icon transitions.
+ */
 export function InteractiveHoverButton({
   children,
   className,
