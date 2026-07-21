@@ -5,6 +5,10 @@ import { cookies } from 'next/headers'
  * If using Fluid compute: Don't put this client in a global variable. Always create a new client within each
  * function when using it.
  */
+/**
+ * Creates a server-side Supabase client initialized with cookies for SSR.
+ * @returns Server Supabase client instance.
+ */
 export async function createClient() {
   const cookieStore = await cookies()
 
