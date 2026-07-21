@@ -151,6 +151,14 @@ export async function sendProvinceAlerts(predictions: PredictionPayload[], disea
   }
 }
 
+/**
+ * Generates formatted HTML, plain text, and subject line for email alerts.
+ * @param user User object receiving the alert.
+ * @param userProvincePrediction Prediction data specific to the user's province.
+ * @param disease Name of the disease outbreak.
+ * @param nationalPrediction Aggregated national prediction data.
+ * @returns Object containing html, text, and subject properties.
+ */
 function generateEmailContent(
   user: User,
   userProvincePrediction: PredictionPayload | undefined,
