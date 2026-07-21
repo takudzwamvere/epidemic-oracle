@@ -15,6 +15,9 @@ export interface PredictionPayload {
   growth_rate?: string;
 }
 
+/**
+ * Interface representing national-level outbreak prediction aggregated stats.
+ */
 export interface NationalPrediction {
   total_predicted_cases?: number;
   average_risk?: string;
