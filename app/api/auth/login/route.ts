@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword, createSessionToken } from '@/lib/auth';
 
+/**
+ * Handles POST requests to authenticate users, generate session token, and set session cookie.
+ * @param request HTTP POST Request containing user credentials (email and password).
+ * @returns JSON response with success status and user details, plus HTTP-only session cookie.
+ */
 export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
