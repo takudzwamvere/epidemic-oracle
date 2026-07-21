@@ -44,6 +44,12 @@ export async function PATCH(
   }
 }
 
+/**
+ * Handles DELETE requests to remove a user by ID (SuperAdmin restricted).
+ * @param request HTTP Request instance.
+ * @param params Context parameters containing user ID.
+ * @returns JSON response with deletion status message.
+ */
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
