@@ -64,6 +64,9 @@ const sidebarItems: SidebarItem[] = [
   },
 ];
 
+/**
+ * Layout component for administrator pages, featuring collateral sidebar navigation, top bar, and role authentication checks.
+ */
 export default function AdminLayout({
   children,
 }: {
