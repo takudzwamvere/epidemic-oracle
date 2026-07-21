@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionUser } from '@/lib/auth';
 
+/**
+ * Handles PATCH requests to update a specific user's attributes (SuperAdmin restricted).
+ * @param request HTTP Request containing updated user fields.
+ * @param params Context parameters containing user ID.
+ * @returns JSON response with updated user object.
+ */
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
