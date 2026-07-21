@@ -47,6 +47,9 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * Sub-heading or descriptive text element for card headers.
+ */
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
