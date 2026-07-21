@@ -4,6 +4,9 @@ import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
 import { User } from '@prisma/client';
 
+/**
+ * Interface representing prediction payload data for a specific province.
+ */
 export interface PredictionPayload {
   province: string;
   risk_level: string;
