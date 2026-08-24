@@ -141,9 +141,14 @@ To add a new country or dataset without writing any new parsing code:
 
 ---
 
-## 4. Verification & Status
+## 4. Verification & Build Status
 
 - **Git Status:** All changes committed and merged into `master`.
-- **TypeScript:** Type-checked; zero newly introduced type errors.
+- **TypeScript:** `npx tsc --noEmit` exited cleanly with code `0` (zero errors).
+- **Prisma Client:** Generated to `./app/generated/prisma`.
+- **Production Build:** `npm run build` completed successfully:
+  - **Turbopack Compilation:** `✓ Compiled successfully in 22.7s`
+  - **Static Page Generation:** `✓ Generating static pages (32/32)`
+  - **All Routes:** 32 static / dynamic routes prerendered and optimized.
 - **Routing:** All routes verified (`/`, `/auth/login`, `/admin`, `/superadmin`, `/admin/reports`, `/admin/settings`, `/admin/datasets`, `/admin/upload`).
-- **Dev Server:** Running on port `3001`.
+- **Dev Server:** Operational on port `3001`.
