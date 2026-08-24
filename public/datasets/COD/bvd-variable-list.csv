@@ -1,0 +1,7 @@
+position,name,type,isnumeric,format,vallab,varlab
+1,Province,str,0,%15s,,Province name
+2,Health Zone,str,0,%30s,,Health zone name
+3,Avg days (prior),float,1,%9.3e,missings,Average presence days per cohort member in the look-back (prior) period; blank for No data and origin zones
+4,Avg days (follow-up),float,1,%9.3e,missings,Average presence days per cohort member in the follow-up period; blank for No data and origin zones
+5,Log2 ratio,float,1,%9.3f,missings,Log base-2 ratio of follow-up to prior average presence days: log2(follow-up / prior); blank for No data and origin zones
+6,Flag,str,0,%10s,,Data quality flag: 'No data' = zone excluded from analysis; 'Origin' = cohort origin zone; blank = included

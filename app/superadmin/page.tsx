@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   BarChart3, 
@@ -7,10 +7,31 @@ import {
   TrendingUp, 
   AlertTriangle, 
   Shield,
-  Database
+  Database,
+  Globe,
+  Loader2
 } from 'lucide-react';
+import { StatsCard } from '@/components/dashboard/StatsCard';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { loadPublicDatasets, type TimeSeriesPoint } from '@/lib/datasets';
 
 const SuperAdminDashboard = () => {
+  // ── Dataset preview state (demonstrates the normalization layer) ──
+  const [previewData, setPreviewData] = useState<Record<string, TimeSeriesPoint[]>>({});
+  const [previewLoading, setPreviewLoading] = useState(true);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPreviewLoading(true);
+    loadPublicDatasets(['COD/drc-ebola', 'ZWE/glide'])
+      .then((data) => {
+        setPreviewData(data);
+        setPreviewError(null);
+      })
+      .catch((err) => setPreviewError(String(err)))
+      .finally(() => setPreviewLoading(false));
+  }, []);
+
   const systemStats = [
     {
       name: 'Total Predictions',
@@ -101,7 +122,7 @@ const SuperAdminDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+      <div className="bg-white border border-slate-200 rounded-none p-6 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Predictive Analytics Dashboard</h1>
@@ -109,7 +130,7 @@ const SuperAdminDashboard = () => {
               Real-time disease outbreak predictions and system-wide ML model monitoring
             </p>
           </div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg self-start sm:self-auto">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-none self-start sm:self-auto">
             <Shield className="w-4 h-4 text-emerald-600" />
             <span className="text-emerald-700 text-xs font-bold tracking-wide uppercase">All Systems Operational</span>
           </div>
@@ -119,14 +140,14 @@ const SuperAdminDashboard = () => {
       {/* System Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {systemStats.map((stat) => (
-          <div key={stat.name} className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+          <div key={stat.name} className="bg-white border border-slate-200 rounded-none p-5 shadow-xs">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider">{stat.name}</p>
                 <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
                 <p className="text-slate-400 text-[10px] mt-1">{stat.description}</p>
               </div>
-              <div className="w-10 h-10 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-50 border border-blue-100 rounded-none flex items-center justify-center">
                 <stat.icon className="w-5 h-5 text-blue-600" />
               </div>
             </div>
@@ -143,14 +164,14 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* Disease Models */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+      <div className="bg-white border border-slate-200 rounded-none p-6 shadow-xs">
         <h2 className="text-lg font-bold text-slate-900 mb-4">Disease Prediction Models</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {diseaseModels.map((model) => (
             <Link
               key={model.name}
               href={model.path}
-              className="block p-5 bg-slate-50/50 hover:bg-white rounded-xl border border-slate-150 hover:border-blue-500/30 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md"
+              className="block p-5 bg-slate-50/50 hover:bg-white rounded-none border border-slate-150 hover:border-blue-500/30 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-slate-900 font-bold text-sm">{model.name}</h3>
@@ -187,42 +208,42 @@ const SuperAdminDashboard = () => {
 
       {/* Quick Actions & Recent alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+        <div className="bg-white border border-slate-200 rounded-none p-6 shadow-xs">
           <h3 className="text-lg font-bold text-slate-900 mb-4">Model Management</h3>
           <div className="space-y-3">
-            <button className="w-full text-left p-3.5 bg-blue-50/50 hover:bg-blue-50 border border-blue-150 rounded-lg transition-colors">
+            <button className="w-full text-left p-3.5 bg-blue-50/50 hover:bg-blue-50 border border-blue-150 rounded-none transition-colors">
               <div className="text-blue-900 text-sm font-semibold">Retrain All Models</div>
               <div className="text-blue-700/80 text-xs mt-0.5">Force re-training across all 5 disease datasets</div>
             </button>
-            <button className="w-full text-left p-3.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors">
+            <button className="w-full text-left p-3.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-none transition-colors">
               <div className="text-slate-900 text-sm font-semibold">Performance Report</div>
               <div className="text-slate-500 text-xs mt-0.5">Generate and download model quality report</div>
             </button>
-            <button className="w-full text-left p-3.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors">
+            <button className="w-full text-left p-3.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-none transition-colors">
               <div className="text-slate-900 text-sm font-semibold">Alert Settings</div>
               <div className="text-slate-500 text-xs mt-0.5">Configure prediction and confidence thresholds</div>
             </button>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+        <div className="bg-white border border-slate-200 rounded-none p-6 shadow-xs">
           <h3 className="text-lg font-bold text-slate-900 mb-4">Recent Predictions</h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-lg">
+            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-none">
               <div>
                 <div className="text-slate-800 text-sm font-semibold">Malaria - Harare</div>
                 <div className="text-slate-500 text-xs mt-0.5">High risk predicted for February</div>
               </div>
               <span className="text-rose-600 text-xs font-bold bg-rose-50 px-2.5 py-1 rounded-full border border-rose-100">+42%</span>
             </div>
-            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-lg">
+            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-none">
               <div>
                 <div className="text-slate-800 text-sm font-semibold">Cholera - Manicaland</div>
                 <div className="text-slate-500 text-xs mt-0.5">Moderate outbreak likely</div>
               </div>
               <span className="text-amber-600 text-xs font-bold bg-amber-50 px-2.5 py-1 rounded-full border border-amber-100">+18%</span>
             </div>
-            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-lg">
+            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-none">
               <div>
                 <div className="text-slate-800 text-sm font-semibold">Influenza - Bulawayo</div>
                 <div className="text-slate-500 text-xs mt-0.5">Seasonal increase expected</div>
@@ -232,6 +253,73 @@ const SuperAdminDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* ── Public Dataset Preview (normalization layer demo) ── */}
+      <Card className="mt-8">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Globe className="w-5 h-5 text-blue-600" />
+            <CardTitle>Public Reference Datasets</CardTitle>
+          </div>
+          <p className="text-slate-500 text-sm mt-1">
+            Loaded via <code className="text-xs bg-slate-100 px-1">loadPublicDataset()</code> — 
+            normalized through the dataset layer from <code className="text-xs bg-slate-100 px-1">/public/datasets/</code>
+          </p>
+        </CardHeader>
+        <CardContent>
+          {previewLoading ? (
+            <div className="flex items-center gap-2 text-slate-500 text-sm py-4">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Loading dataset previews...
+            </div>
+          ) : previewError ? (
+            <div className="text-rose-600 text-sm py-2">Error: {previewError}</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {Object.entries(previewData).map(([key, series]) => (
+                <div key={key} className="border border-slate-200">
+                  <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
+                    <span className="font-semibold text-slate-800 text-sm">{key}</span>
+                    <span className="ml-2 text-xs text-slate-500">{series.length} data points</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-slate-100 bg-slate-50/50">
+                          <th className="px-4 py-2 text-left font-semibold text-slate-600 uppercase tracking-wider">Date</th>
+                          <th className="px-4 py-2 text-right font-semibold text-slate-600 uppercase tracking-wider">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {series.slice(0, 8).map((point) => (
+                          <tr key={point.date} className="hover:bg-slate-50 transition-colors">
+                            <td className="px-4 py-2 text-slate-700 font-mono">{point.date}</td>
+                            <td className="px-4 py-2 text-right text-slate-900 font-medium tabular-nums">
+                              {point.value.toLocaleString()}
+                            </td>
+                          </tr>
+                        ))}
+                        {series.length > 8 && (
+                          <tr>
+                            <td colSpan={2} className="px-4 py-2 text-center text-slate-400 italic">
+                              +{series.length - 8} more rows
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+              {Object.keys(previewData).length === 0 && (
+                <div className="col-span-2 text-center text-slate-400 text-sm py-8">
+                  No datasets loaded. Ensure public/datasets/COD/drc-ebola.csv exists.
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

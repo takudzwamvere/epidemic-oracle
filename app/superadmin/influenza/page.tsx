@@ -174,7 +174,7 @@ const AIAnalysisContent = ({ aiAnalysis }: { aiAnalysis: any }) => {
   return (
     <div className="space-y-8">
       {/* National Overview */}
-      <div className="bg-gradient-to-r from-sky-50 to-blue-50 border-l-4 border-sky-500 p-6 rounded-lg shadow-sm">
+      <div className="bg-gradient-to-r from-sky-50 to-blue-50 border-l-4 border-sky-500 p-6 rounded-none shadow-sm">
         <div className="flex items-center gap-3 mb-4">
           <Wind className="w-6 h-6 text-sky-600" />
           <h3 className="text-lg font-bold text-sky-900">National Outbreak Intelligence</h3>
@@ -190,10 +190,10 @@ const AIAnalysisContent = ({ aiAnalysis }: { aiAnalysis: any }) => {
       </div>
 
       {/* Provincial Analysis */}
-      <div className="border border-gray-200 rounded-lg p-6">
+      <div className="border border-slate-200 rounded-none p-6">
         <div className="flex items-center gap-3 mb-6">
           <Map className="w-6 h-6 text-gray-700" />
-          <h3 className="text-lg font-bold text-gray-900">Provincial Risk Intelligence</h3>
+          <h3 className="text-lg font-bold text-slate-900">Provincial Risk Intelligence</h3>
         </div>
         <div className="space-y-4">
           {aiAnalysis.provincialAnalysis.map((province: any, index: number) => (
@@ -208,7 +208,7 @@ const AIAnalysisContent = ({ aiAnalysis }: { aiAnalysis: any }) => {
       </div>
 
       {/* Strategic Recommendations */}
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500 p-6 rounded-lg shadow-sm">
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500 p-6 rounded-none shadow-sm">
         <div className="flex items-center gap-3 mb-6">
           <Shield className="w-6 h-6 text-indigo-600" />
           <h3 className="text-lg font-bold text-indigo-900">Strategic Response Framework</h3>
@@ -221,7 +221,7 @@ const AIAnalysisContent = ({ aiAnalysis }: { aiAnalysis: any }) => {
       </div>
 
       {/* Predictive Insights */}
-      <div className="bg-gradient-to-r from-purple-50 to-violet-50 border-l-4 border-purple-500 p-6 rounded-lg shadow-sm">
+      <div className="bg-gradient-to-r from-purple-50 to-violet-50 border-l-4 border-purple-500 p-6 rounded-none shadow-sm">
         <div className="flex items-center gap-3 mb-6">
           <AlertCircle className="w-6 h-6 text-purple-600" />
           <h3 className="text-lg font-bold text-purple-900">Predictive Intelligence & Projections</h3>
@@ -241,7 +241,7 @@ const ProvincialAnalysisItem = ({ province, analysis, risk }: { province: string
   const displayText = useTypewriter(analysis, 12);
   
   return (
-    <div className={`border-l-4 p-5 rounded-lg transition-all duration-300 hover:shadow-md ${
+    <div className={`border-l-4 p-5 rounded-none transition-all duration-300 hover:shadow-md ${
       risk === 'High' 
         ? 'bg-red-50 border-red-400 hover:bg-red-100' 
         : risk === 'Medium'
@@ -254,7 +254,7 @@ const ProvincialAnalysisItem = ({ province, analysis, risk }: { province: string
           risk === 'Medium' ? 'bg-amber-500' : 'bg-green-500'
         }`}></div>
         <div className="flex-1">
-          <h4 className="font-bold text-gray-900 text-lg mb-2">{province}</h4>
+          <h4 className="font-bold text-slate-900 text-lg mb-2">{province}</h4>
           <p className="text-gray-700 leading-relaxed">{displayText}</p>
         </div>
       </div>
@@ -267,7 +267,7 @@ const RecommendationItem = ({ text, index }: { text: string; index: number }) =>
   const displayText = useTypewriter(text, 18);
   
   return (
-    <div className="flex items-start gap-4 p-4 bg-white rounded-lg border border-indigo-200 hover:shadow-md transition-all duration-200">
+    <div className="flex items-start gap-4 p-4 bg-white rounded-none border border-indigo-200 hover:shadow-md transition-all duration-200">
       <span className="flex-shrink-0 w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold mt-1">
         {index + 1}
       </span>
@@ -281,7 +281,7 @@ const InsightItem = ({ text }: { text: string }) => {
   const displayText = useTypewriter(text, 25);
   
   return (
-    <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-purple-200">
+    <div className="flex items-start gap-3 p-4 bg-white rounded-none border border-purple-200">
       <span className="text-purple-600 mt-1 flex-shrink-0">💡</span>
       <span className="text-gray-700 leading-relaxed">{displayText}</span>
     </div>
@@ -719,8 +719,8 @@ const InfluenzaPredictionPage = () => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-sm">
-          <p className="font-semibold text-gray-900">{label}</p>
+        <div className="bg-white p-4 border border-slate-200 rounded-none shadow-sm">
+          <p className="font-semibold text-slate-900">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
               {entry.name}: {entry.value.toLocaleString()}
@@ -736,7 +736,7 @@ const InfluenzaPredictionPage = () => {
     <div className="space-y-6">
       {/* Alert Notification */}
       {alertStatus.type && (
-        <div className={`p-4 rounded-lg border ${
+        <div className={`p-4 rounded-none border ${
           alertStatus.type === 'success' 
             ? 'bg-green-50 border-green-200 text-green-800' 
             : 'bg-red-50 border-red-200 text-red-800'
@@ -757,7 +757,7 @@ const InfluenzaPredictionPage = () => {
             </div>
             <button
               onClick={() => setAlertStatus({ type: null, message: '' })}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-slate-500 hover:text-gray-700"
             >
               ×
             </button>
@@ -766,18 +766,18 @@ const InfluenzaPredictionPage = () => {
       )}
 
       {/* Header */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 capitalize">Influenza Outbreak Predictions</h1>
-            <p className="text-gray-600">Monthly forecast and risk analysis for Zimbabwe</p>
+            <h1 className="text-2xl font-bold text-slate-900 capitalize">Influenza Outbreak Predictions</h1>
+            <p className="text-slate-600">Monthly forecast and risk analysis for Zimbabwe</p>
           </div>
           <div className="hidden md:flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-slate-600">
               <Users className="w-4 h-4" />
               <span>{totalUsersCount} users in system</span>
             </div>
-            <div className="flex items-center justify-center w-12 h-12 bg-sky-50 rounded-lg">
+            <div className="flex items-center justify-center w-12 h-12 bg-sky-50 rounded-none">
               <TrendingUp className="w-6 h-6 text-sky-400" />
             </div>
           </div>
@@ -787,57 +787,57 @@ const InfluenzaPredictionPage = () => {
       {/* Stats Overview */}
       {nationalPrediction && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">Predicted Cases (Next Month)</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
+                <p className="text-slate-500 text-sm">Predicted Cases (Next Month)</p>
+                <p className="text-2xl font-bold text-slate-900 mt-1">
                   {nationalPrediction.total_predicted_cases.toLocaleString()}
                 </p>
               </div>
-              <div className="flex items-center justify-center w-12 h-12 bg-sky-50 rounded-lg">
+              <div className="flex items-center justify-center w-12 h-12 bg-sky-50 rounded-none">
                 <TrendingUp className="w-6 h-6 text-sky-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">High Risk Provinces</p>
+                <p className="text-slate-500 text-sm">High Risk Provinces</p>
                 <p className="text-2xl font-bold text-red-600 mt-1">
                   {nationalPrediction.high_risk_provinces.length}
                 </p>
               </div>
-              <div className="flex items-center justify-center w-12 h-12 bg-red-50 rounded-lg">
+              <div className="flex items-center justify-center w-12 h-12 bg-red-50 rounded-none">
                 <AlertTriangle className="w-6 h-6 text-red-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">Overall Risk</p>
+                <p className="text-slate-500 text-sm">Overall Risk</p>
                 <p className="text-2xl font-bold text-yellow-600 mt-1">
                   {nationalPrediction.average_risk}
                 </p>
               </div>
-              <div className="flex items-center justify-center w-12 h-12 bg-yellow-50 rounded-lg">
+              <div className="flex items-center justify-center w-12 h-12 bg-yellow-50 rounded-none">
                 <Activity className="w-6 h-6 text-yellow-400" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">Model Confidence</p>
+                <p className="text-slate-500 text-sm">Model Confidence</p>
                 <p className="text-2xl font-bold text-green-600 mt-1">
                   {nationalPrediction.overall_confidence}%
                 </p>
               </div>
-              <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg">
+              <div className="flex items-center justify-center w-12 h-12 bg-green-50 rounded-none">
                 <TrendingUp className="w-6 h-6 text-green-400" />
               </div>
             </div>
@@ -846,16 +846,16 @@ const InfluenzaPredictionPage = () => {
       )}
 
       {/* Dataset Selection */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Select 2025 Influenza Datasets</h3>
-            <p className="text-gray-600 text-sm">Choose which uploaded influenza datasets to use for predictions</p>
+            <h3 className="text-lg font-semibold text-slate-900">Select 2025 Influenza Datasets</h3>
+            <p className="text-slate-600 text-sm">Choose which uploaded influenza datasets to use for predictions</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={loadUploadedFiles}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-500 hover:bg-gray-600 text-white font-semibold rounded-none transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               Refresh Files
@@ -864,7 +864,7 @@ const InfluenzaPredictionPage = () => {
         </div>
 
         {/* Auto-Alerts Toggle */}
-        <div className="flex items-center gap-3 p-4 bg-sky-50 rounded-lg border border-sky-200 mb-6">
+        <div className="flex items-center gap-3 p-4 bg-sky-50 rounded-none border border-sky-200 mb-6">
           <div className="flex items-center gap-3 flex-1">
             <div className="flex items-center gap-2">
               <input
@@ -878,7 +878,7 @@ const InfluenzaPredictionPage = () => {
                 {autoSendAlerts ? (
                   <Bell className="w-4 h-4 text-sky-500" />
                 ) : (
-                  <BellOff className="w-4 h-4 text-gray-400" />
+                  <BellOff className="w-4 h-4 text-slate-400" />
                 )}
                 Automatically send email alerts when predictions are generated
               </label>
@@ -891,11 +891,11 @@ const InfluenzaPredictionPage = () => {
 
         {uploadedFiles.length > 0 ? (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-none border border-slate-200">
               <div className="flex items-center gap-3">
                 <button
                   onClick={selectAllFiles}
-                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors"
+                  className="flex items-center gap-2 text-gray-700 hover:text-slate-900 transition-colors"
                 >
                   <input
                     type="checkbox"
@@ -907,7 +907,7 @@ const InfluenzaPredictionPage = () => {
                     {selectedFiles.length === uploadedFiles.length ? 'Deselect All' : 'Select All'}
                   </span>
                 </button>
-                <span className="text-gray-600 text-sm">
+                <span className="text-slate-600 text-sm">
                   {selectedFiles.length} of {uploadedFiles.length} influenza files selected
                 </span>
               </div>
@@ -916,7 +916,7 @@ const InfluenzaPredictionPage = () => {
                 <button
                   onClick={generatePredictions}
                   disabled={selectedFiles.length === 0 || predicting}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {predicting ? (
                     <RefreshCw className="w-4 h-4 animate-spin" />
@@ -930,7 +930,7 @@ const InfluenzaPredictionPage = () => {
                   <button
                     onClick={handleSendEmailAlerts}
                     disabled={sendingAlerts}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-none transition-colors disabled:opacity-50"
                   >
                     {sendingAlerts ? (
                       <RefreshCw className="w-4 h-4 animate-spin" />
@@ -946,7 +946,7 @@ const InfluenzaPredictionPage = () => {
                   <button
                     onClick={handleAIAnalysis}
                     disabled={generatingAnalysis}
-                    className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
+                    className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200"
                   >
                     {generatingAnalysis ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -963,10 +963,10 @@ const InfluenzaPredictionPage = () => {
               {uploadedFiles.map((file, index) => (
                 <div
                   key={index}
-                  className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                  className={`p-4 border rounded-none cursor-pointer transition-all ${
                     selectedFiles.includes(file.name)
                       ? 'bg-green-50 border-green-300 shadow-sm'
-                      : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                      : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-gray-300'
                   }`}
                   onClick={() => toggleFileSelection(file.name)}
                 >
@@ -977,15 +977,15 @@ const InfluenzaPredictionPage = () => {
                       onChange={() => toggleFileSelection(file.name)}
                       className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                     />
-                    <FileText className="w-5 h-5 text-gray-400" />
-                    <span className="text-gray-900 text-sm truncate font-medium">{file.name}</span>
+                    <FileText className="w-5 h-5 text-slate-400" />
+                    <span className="text-slate-900 text-sm truncate font-medium">{file.name}</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-600 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="text-center py-8 text-slate-600 bg-slate-50 rounded-none border border-slate-200">
             <Database className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p className="font-medium">No influenza datasets found</p>
             <p className="text-sm mt-1">Upload CSV files with &apos;influenza&apos; or &apos;flu&apos; in the filename to get started</p>
@@ -999,13 +999,13 @@ const InfluenzaPredictionPage = () => {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Line Chart */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">National Trend & Forecast</h3>
+            <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">National Trend & Forecast</h3>
               <ResponsiveContainer width="100%" height={400}>
                 <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis dataKey="name" stroke="#6B7280" />
-                  <YAxis stroke="#6B7280" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="name" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
                   <Line 
@@ -1038,8 +1038,8 @@ const InfluenzaPredictionPage = () => {
             </div>
 
             {/* Pie Chart */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Provincial Case Distribution</h3>
+            <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Provincial Case Distribution</h3>
               <ResponsiveContainer width="100%" height={400}>
                 <PieChart>
                   <Pie
@@ -1064,38 +1064,38 @@ const InfluenzaPredictionPage = () => {
           </div>
 
           {/* Risk Map */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <Map className="w-5 h-5 text-gray-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Zimbabwe Risk Zones Map</h3>
+              <Map className="w-5 h-5 text-slate-600" />
+              <h3 className="text-lg font-semibold text-slate-900">Zimbabwe Risk Zones Map</h3>
             </div>
-            <div className="h-96 rounded-lg border border-gray-200 overflow-hidden bg-gray-50">
+            <div className="h-96 rounded-none border border-slate-200 overflow-hidden bg-slate-50">
               <MapComponent predictions={predictions} />
             </div>
             <div className="flex items-center justify-center gap-6 mt-4">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-green-500 rounded"></div>
-                <span className="text-sm text-gray-600">Low Risk</span>
+                <span className="text-sm text-slate-600">Low Risk</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-                <span className="text-sm text-gray-600">Medium Risk</span>
+                <span className="text-sm text-slate-600">Medium Risk</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-red-500 rounded"></div>
-                <span className="text-sm text-gray-600">High Risk</span>
+                <span className="text-sm text-slate-600">High Risk</span>
               </div>
             </div>
           </div>
 
           {/* Provincial Predictions */}
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Provincial Breakdown</h3>
+          <div className="bg-white border border-slate-200 rounded-none p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Provincial Breakdown</h3>
             <div className="space-y-3">
               {predictions.map((prediction, index) => (
                 <div
                   key={index}
-                  className={`p-4 border-l-4 rounded-lg ${
+                  className={`p-4 border-l-4 rounded-none ${
                     prediction.risk_level === 'High'
                       ? 'bg-red-50 border-red-400'
                       : prediction.risk_level === 'Medium'
@@ -1105,19 +1105,19 @@ const InfluenzaPredictionPage = () => {
                 >
                   <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div>
-                      <p className="text-gray-500 text-xs">Province</p>
-                      <p className="text-gray-900 font-semibold">{prediction.province}</p>
+                      <p className="text-slate-500 text-xs">Province</p>
+                      <p className="text-slate-900 font-semibold">{prediction.province}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Current Cases</p>
-                      <p className="text-gray-900 font-semibold">{prediction.current_cases.toLocaleString()}</p>
+                      <p className="text-slate-500 text-xs">Current Cases</p>
+                      <p className="text-slate-900 font-semibold">{prediction.current_cases.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Predicted (Next Month)</p>
-                      <p className="text-gray-900 font-semibold">{prediction.predicted_cases.toLocaleString()}</p>
+                      <p className="text-slate-500 text-xs">Predicted (Next Month)</p>
+                      <p className="text-slate-900 font-semibold">{prediction.predicted_cases.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-xs">Trend</p>
+                      <p className="text-slate-500 text-xs">Trend</p>
                       <div className="flex items-center gap-1 mt-1">
                         {prediction.trend === 'increasing' ? (
                           <>
@@ -1130,12 +1130,12 @@ const InfluenzaPredictionPage = () => {
                             <span className="text-green-600 font-semibold">{prediction.growth_rate}</span>
                           </>
                         ) : (
-                          <span className="text-gray-600 font-semibold">Stable</span>
+                          <span className="text-slate-600 font-semibold">Stable</span>
                         )}
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-gray-500 text-xs">Risk Level</p>
+                      <p className="text-slate-500 text-xs">Risk Level</p>
                       <span className={`inline-block px-3 py-1 rounded text-xs font-semibold mt-1 ${
                         prediction.risk_level === 'High'
                           ? 'bg-red-200 text-red-800'
@@ -1157,7 +1157,7 @@ const InfluenzaPredictionPage = () => {
       {/* AI Analysis Modal */}
       {showAIAnalysis && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden">
+          <div className="bg-white rounded-none max-w-6xl w-full max-h-[90vh] overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white p-6">
               <div className="flex items-center justify-between">
@@ -1189,21 +1189,21 @@ const InfluenzaPredictionPage = () => {
                       <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-500 mx-auto mb-4"></div>
                       <Brain className="w-8 h-8 text-amber-500 absolute top-4 left-1/2 transform -translate-x-1/2" />
                     </div>
-                    <p className="text-gray-600 font-medium mt-4">Processing outbreak intelligence...</p>
+                    <p className="text-slate-600 font-medium mt-4">Processing outbreak intelligence...</p>
                     <div className="mt-4 space-y-2">
-                      <div className={`flex items-center gap-2 text-sm text-gray-500 transition-all duration-300 ${currentAnalysisStep >= 1 ? 'text-amber-600' : ''}`}>
+                      <div className={`flex items-center gap-2 text-sm text-slate-500 transition-all duration-300 ${currentAnalysisStep >= 1 ? 'text-amber-600' : ''}`}>
                         <div className={`w-2 h-2 rounded-full ${currentAnalysisStep >= 1 ? 'bg-amber-500' : 'bg-gray-300'}`}></div>
                         Analyzing national transmission patterns
                       </div>
-                      <div className={`flex items-center gap-2 text-sm text-gray-500 transition-all duration-300 ${currentAnalysisStep >= 2 ? 'text-amber-600' : ''}`}>
+                      <div className={`flex items-center gap-2 text-sm text-slate-500 transition-all duration-300 ${currentAnalysisStep >= 2 ? 'text-amber-600' : ''}`}>
                         <div className={`w-2 h-2 rounded-full ${currentAnalysisStep >= 2 ? 'bg-amber-500' : 'bg-gray-300'}`}></div>
                         Assessing provincial risk dynamics
                       </div>
-                      <div className={`flex items-center gap-2 text-sm text-gray-500 transition-all duration-300 ${currentAnalysisStep >= 3 ? 'text-amber-600' : ''}`}>
+                      <div className={`flex items-center gap-2 text-sm text-slate-500 transition-all duration-300 ${currentAnalysisStep >= 3 ? 'text-amber-600' : ''}`}>
                         <div className={`w-2 h-2 rounded-full ${currentAnalysisStep >= 3 ? 'bg-amber-500' : 'bg-gray-300'}`}></div>
                         Generating intervention strategies
                       </div>
-                      <div className={`flex items-center gap-2 text-sm text-gray-500 transition-all duration-300 ${currentAnalysisStep >= 4 ? 'text-amber-600' : ''}`}>
+                      <div className={`flex items-center gap-2 text-sm text-slate-500 transition-all duration-300 ${currentAnalysisStep >= 4 ? 'text-amber-600' : ''}`}>
                         <div className={`w-2 h-2 rounded-full ${currentAnalysisStep >= 4 ? 'bg-amber-500' : 'bg-gray-300'}`}></div>
                         Calculating predictive insights
                       </div>
@@ -1216,8 +1216,8 @@ const InfluenzaPredictionPage = () => {
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-50 px-6 py-4 border-t">
-              <div className="flex justify-between items-center text-sm text-gray-600">
+            <div className="bg-slate-50 px-6 py-4 border-t">
+              <div className="flex justify-between items-center text-sm text-slate-600">
                 <div className="flex items-center gap-2">
                   <Brain className="w-4 h-4" />
                   <span>Epidemiological AI Analysis • Influenza Outbreak Response System</span>

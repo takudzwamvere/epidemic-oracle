@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import { 
   BarChart3, 
@@ -187,13 +188,22 @@ export default function SuperAdminLayout({
                     href={item.href}
                     onClick={() => setMobileSidebarOpen(false)}
                     className={`
-                      flex items-center gap-3 px-4 py-3 transition-all duration-200 relative
-                      ${isActive 
-                        ? 'bg-white text-blue-700 font-semibold border-r-2 border-blue-600 shadow-xs' 
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      flex items-center gap-3 px-4 py-3 transition-colors duration-200 relative overflow-hidden
+                      ${isActive
+                        ? 'text-blue-700 font-semibold'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
                       }
                     `}
                   >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeNavSuperAdmin"
+                        className="absolute inset-0 bg-blue-100/50 border-l-4 border-blue-600"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      />
+                    )}
                     <div className={`flex-shrink-0 transition-colors ${isActive ? 'text-blue-600' : 'text-slate-400'}`}>
                       {item.icon}
                     </div>
