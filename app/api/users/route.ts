@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { hashPassword, getSessionUser } from '@/lib/auth';
+import { getAllUsers, createUser, findUserByEmail } from '@/lib/users';
+import { getSessionUser } from '@/lib/auth';
 
 /**
  * GET handler to retrieve all users.
- * Accessible only by SUPERADMIN users.
  */
 export async function GET(request: Request) {
   try {
@@ -12,14 +11,11 @@ export async function GET(request: Request) {
     if (!sessionUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    if (sessionUser.role !== 'SUPERADMIN') {
+    if (sessionUser.role !== 'SUPERADMIN' && sessionUser.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const users = await prisma.user.findMany({
-      orderBy: { created_at: 'desc' },
-    });
-
+    const users = getAllUsers();
     return NextResponse.json(users);
   } catch (error: any) {
     console.error('Error fetching users:', error);
@@ -32,7 +28,6 @@ export async function GET(request: Request) {
 
 /**
  * POST handler to create a new user.
- * Accessible only by SUPERADMIN users.
  */
 export async function POST(request: Request) {
   try {
@@ -44,7 +39,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { username, email, province } = await request.json();
+    const { username, email, province, role } = await request.json();
 
     if (!email || !username) {
       return NextResponse.json(
@@ -53,10 +48,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
+    const existingUser = findUserByEmail(email);
     if (existingUser) {
       return NextResponse.json(
         { error: 'Email already exists' },
@@ -64,19 +56,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Default password for new users created by superadmin
-    const defaultPassword = 'welcome123';
-    const passwordHash = await hashPassword(defaultPassword);
-
-    const newUser = await prisma.user.create({
-      data: {
-        username,
-        email,
-        province: province || 'Harare',
-        passwordHash,
-        is_active: true,
-        role: 'USER',
-      },
+    const newUser = createUser({
+      username,
+      email,
+      province: province || 'Harare',
+      is_active: true,
+      role: role || 'USER',
     });
 
     return NextResponse.json(newUser, { status: 201 });

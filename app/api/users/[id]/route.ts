@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { updateUser, deleteUser, findUserById } from '@/lib/users';
 import { getSessionUser } from '@/lib/auth';
 
 /**
  * Handles PATCH requests to update a specific user's attributes (SuperAdmin restricted).
- * @param request HTTP Request containing updated user fields.
- * @param params Context parameters containing user ID.
- * @returns JSON response with updated user object.
  */
 export async function PATCH(
   request: Request,
@@ -24,17 +21,18 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: {
-        username: body.username,
-        email: body.email,
-        province: body.province,
-        is_active: body.is_active,
-      },
+    const updated = updateUser(id, {
+      username: body.username,
+      email: body.email,
+      province: body.province,
+      is_active: body.is_active,
     });
 
-    return NextResponse.json(updatedUser);
+    if (!updated) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(updated);
   } catch (error: any) {
     console.error('Error updating user:', error);
     return NextResponse.json(
@@ -46,9 +44,6 @@ export async function PATCH(
 
 /**
  * Handles DELETE requests to remove a user by ID (SuperAdmin restricted).
- * @param request HTTP Request instance.
- * @param params Context parameters containing user ID.
- * @returns JSON response with deletion status message.
  */
 export async function DELETE(
   request: Request,
@@ -64,10 +59,11 @@ export async function DELETE(
     }
 
     const { id } = await params;
+    const deleted = deleteUser(id);
 
-    await prisma.user.delete({
-      where: { id },
-    });
+    if (!deleted) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
 
     return NextResponse.json({ success: true, message: 'User deleted successfully' });
   } catch (error: any) {

@@ -1,59 +1,35 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { hashPassword, createSessionToken } from '@/lib/auth';
+import { createUser, findUserByEmail } from '@/lib/users';
+import { createSessionToken } from '@/lib/auth';
 
 /**
- * POST endpoint for handling user registration, password hashing, and session cookie creation.
+ * In-memory user registration route without database requirement.
  */
 export async function POST(request: Request) {
   try {
-    const { email, password, username, province } = await request.json();
+    const { username, email, password, province } = await request.json();
 
-    if (!email || !password) {
+    if (!username || !email || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required.' },
+        { error: 'Username, email, and password are required' },
         { status: 400 }
       );
     }
 
-    if (!email.includes('@')) {
-      return NextResponse.json(
-        { error: 'Please provide a valid email address.' },
-        { status: 400 }
-      );
-    }
-
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters long.' },
-        { status: 400 }
-      );
-    }
-
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
+    const existingUser = findUserByEmail(email);
     if (existingUser) {
       return NextResponse.json(
-        { error: 'An account with this email already exists.' },
+        { error: 'An account with this email already exists' },
         { status: 400 }
       );
     }
 
-    const passwordHash = await hashPassword(password);
-    const resolvedUsername = username || email.split('@')[0];
-    const resolvedProvince = province || 'Harare';
-
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-        passwordHash,
-        username: resolvedUsername,
-        province: resolvedProvince,
-        is_active: true,
-        role: 'USER',
-      },
+    const newUser = createUser({
+      username,
+      email,
+      province: province || 'Harare',
+      is_active: true,
+      role: 'USER',
     });
 
     const token = await createSessionToken({
@@ -65,7 +41,7 @@ export async function POST(request: Request) {
     });
 
     const response = NextResponse.json(
-      { success: true, message: 'Account created successfully', user: { email: newUser.email, username: newUser.username, role: newUser.role, province: newUser.province } },
+      { success: true, message: 'Account created successfully', user: newUser },
       { status: 201 }
     );
 
@@ -76,7 +52,7 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     return response;

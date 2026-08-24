@@ -162,7 +162,12 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link href="/api/auth/guest">
+              <Button variant="ghost" size="sm" className="font-mono text-xs font-bold uppercase tracking-wider text-blue-600 hover:bg-blue-50">
+                ⚡ Guest Demo
+              </Button>
+            </Link>
             <Link href="/auth/login">
               <Button variant="outline" size="sm" className="font-semibold text-xs uppercase tracking-wider">
                 Sign In
@@ -197,13 +202,18 @@ export default function Home() {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Link href="/auth/login">
+              <Link href="/api/auth/guest">
                 <Button variant="primary" size="lg" className="font-bold text-sm uppercase tracking-wider px-6">
-                  Launch Surveillance Platform <ArrowRight className="w-4 h-4 ml-2" />
+                  ⚡ 1-Click Guest Access <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/auth/login">
+                <Button variant="outline" size="lg" className="font-bold text-sm uppercase tracking-wider px-6">
+                  Sign In With Credentials
                 </Button>
               </Link>
               <Link href="/superadmin">
-                <Button variant="outline" size="lg" className="font-bold text-sm uppercase tracking-wider px-6">
+                <Button variant="ghost" size="lg" className="font-bold text-sm uppercase tracking-wider px-6 border border-slate-200 hover:bg-slate-50">
                   Explore Dataset Registry
                 </Button>
               </Link>

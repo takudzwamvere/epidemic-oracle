@@ -1,5 +1,4 @@
 // services/notificationService.ts
-import { prisma } from '@/lib/prisma';
 
 /**
  * Parameters required to process and trigger an outbreak notification.
@@ -32,10 +31,71 @@ export interface OutbreakNotification {
   prediction_data: unknown;
 }
 
+// In-memory notification store initialized with realistic outbreak alerts
+let notificationsStore: OutbreakNotification[] = [
+  {
+    id: 'notif-cholera-01',
+    disease: 'Cholera',
+    province: 'Harare',
+    risk_level: 'High',
+    predicted_cases: 740,
+    confidence: 91,
+    expected_peak: 'Sep 2026',
+    trigger_reason: 'Extreme case surge predicted: +42.0%',
+    recommended_actions: [
+      'Emergency water purification measures',
+      'Set up oral rehydration points',
+      'Distribute water purification tablets',
+      'Sanitation facility inspection'
+    ],
+    urgency: 'critical',
+    timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 mins ago
+    read: false,
+    prediction_data: { disease: 'Cholera', province: 'Harare', predicted_cases: 740 }
+  },
+  {
+    id: 'notif-ebola-02',
+    disease: 'Ebola',
+    province: 'North Kivu',
+    risk_level: 'High',
+    predicted_cases: 120,
+    confidence: 94,
+    expected_peak: 'Sep 2026',
+    trigger_reason: 'Health zone transmission velocity increase',
+    recommended_actions: [
+      'Deploy rapid response epidemiology teams',
+      'Activate ring vaccination protocols',
+      'Reinforce border health screening points'
+    ],
+    urgency: 'critical',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+    read: false,
+    prediction_data: { disease: 'Ebola', province: 'North Kivu', predicted_cases: 120 }
+  },
+  {
+    id: 'notif-malaria-03',
+    disease: 'Malaria',
+    province: 'Manicaland',
+    risk_level: 'Medium',
+    predicted_cases: 480,
+    confidence: 88,
+    expected_peak: 'Oct 2026',
+    trigger_reason: 'Precipitation index anomaly: +18.5%',
+    recommended_actions: [
+      'Distribute insecticide-treated bed nets',
+      'Initiate vector control spraying',
+      'Stockpile antimalarial drugs'
+    ],
+    urgency: 'high',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12), // 12 hours ago
+    read: false,
+    prediction_data: { disease: 'Malaria', province: 'Manicaland', predicted_cases: 480 }
+  }
+];
+
 export class NotificationService {
   /**
    * Generates, stores, and returns a new outbreak notification.
-   * @param prediction The input prediction dataset values.
    */
   static async createOutbreakNotification(prediction: PredictionInput): Promise<OutbreakNotification> {
     const notification: OutbreakNotification = {
@@ -54,9 +114,7 @@ export class NotificationService {
       prediction_data: prediction
     };
 
-    // Store notification in database
-    await this.storeNotification(notification);
-    
+    notificationsStore.unshift(notification);
     return notification;
   }
 
@@ -64,81 +122,44 @@ export class NotificationService {
    * Fetches all outbreak notifications sorted by newest first.
    */
   static async getAllNotifications(): Promise<OutbreakNotification[]> {
-    try {
-      const data = await prisma.outbreakNotification.findMany({
-        orderBy: { timestamp: 'desc' },
-      });
-
-      return data.map((notif: any) => ({
-        ...notif,
-        risk_level: notif.risk_level as 'High' | 'Medium' | 'Low',
-        urgency: notif.urgency as 'critical' | 'high' | 'medium',
-        timestamp: new Date(notif.timestamp),
-        prediction_data: notif.prediction_data || null
-      }));
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-      return [];
-    }
+    return [...notificationsStore].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
 
   /**
-   * Marks a specific notification as read in the database.
-   * @param notificationId ID of the notification to update.
+   * Marks a specific notification as read.
    */
   static async markAsRead(notificationId: string): Promise<void> {
-    try {
-      await prisma.outbreakNotification.update({
-        where: { id: notificationId },
-        data: { read: true },
-      });
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
+    const item = notificationsStore.find((n) => n.id === notificationId);
+    if (item) {
+      item.read = true;
     }
   }
 
   /**
-   * Counts the total number of unread notifications in the database.
+   * Counts the total number of unread notifications.
    */
   static async getUnreadCount(): Promise<number> {
-    try {
-      return await prisma.outbreakNotification.count({
-        where: { read: false },
-      });
-    } catch (error) {
-      console.error('Error getting unread count:', error);
-      return 0;
-    }
+    return notificationsStore.filter((n) => !n.read).length;
   }
 
-  /**
-   * Calculates the predicted peak month and year dynamically.
-   */
   private static calculateExpectedPeak(): string {
     const now = new Date();
-    const currentMonth = now.getMonth(); // 0-indexed: 0-11
-    const peakMonth = (currentMonth + 1) % 12; // 0-indexed: 0-11
+    const currentMonth = now.getMonth();
+    const peakMonth = (currentMonth + 1) % 12;
     const currentYear = now.getFullYear();
     const peakYear = peakMonth < currentMonth ? currentYear + 1 : currentYear;
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return `${monthNames[peakMonth]} ${peakYear}`;
   }
 
-  /**
-   * Formulates a descriptive reason string based on case increase percentage.
-   */
   private static getTriggerReason(prediction: PredictionInput): string {
-    const increase = ((prediction.predicted_cases - prediction.confirmed_cases) / prediction.confirmed_cases) * 100;
-    
+    const increase = ((prediction.predicted_cases - prediction.confirmed_cases) / Math.max(prediction.confirmed_cases, 1)) * 100;
     if (increase > 50) return `Extreme case surge predicted: +${increase.toFixed(1)}%`;
     if (increase > 30) return `High case increase: +${increase.toFixed(1)}%`;
     if (increase > 15) return `Moderate case rise: +${increase.toFixed(1)}%`;
     return `Slight case increase: +${increase.toFixed(1)}%`;
   }
 
-  /**
-   * Compiles recommended health responses specific to the disease and input.
-   */
   private static generateRecommendedActions(prediction: PredictionInput): string[] {
     const baseActions = [
       'Increase surveillance and testing in affected areas',
@@ -151,32 +172,32 @@ export class NotificationService {
       'Malaria': [
         'Distribute insecticide-treated bed nets',
         'Initiate vector control spraying',
-        'Stockpile antimalarial drugs',
-        'Launch public awareness campaign'
+        'Stockpile antimalarial drugs'
       ],
       'COVID-19': [
         'Activate testing centers',
         'Prepare isolation facilities',
-        'Review vaccination campaign plans',
-        'Implement public gathering guidelines'
+        'Review vaccination campaign plans'
       ],
       'Cholera': [
         'Emergency water purification measures',
         'Set up oral rehydration points',
-        'Distribute water purification tablets',
-        'Sanitation facility inspection'
+        'Distribute water purification tablets'
       ],
       'Influenza': [
         'Increase flu vaccine availability',
         'Prepare outpatient facilities',
-        'Stock antiviral medications',
-        'Public hygiene awareness'
+        'Stock antiviral medications'
       ],
       'Typhoid': [
         'Water quality testing',
         'Food safety inspections',
-        'Stock antibiotics',
-        'Community sanitation drive'
+        'Stock antibiotics'
+      ],
+      'Ebola': [
+        'Deploy rapid response epidemiology teams',
+        'Activate ring vaccination protocols',
+        'Reinforce border health screening points'
       ]
     };
 
@@ -184,32 +205,5 @@ export class NotificationService {
       ...baseActions,
       ...(diseaseSpecificActions[prediction.disease] || [])
     ];
-  }
-
-  /**
-   * Helper method to insert the generated notification record into Prisma database.
-   */
-  private static async storeNotification(notification: OutbreakNotification): Promise<void> {
-    try {
-      await prisma.outbreakNotification.create({
-        data: {
-          id: notification.id,
-          disease: notification.disease,
-          province: notification.province,
-          risk_level: notification.risk_level,
-          predicted_cases: notification.predicted_cases,
-          confidence: notification.confidence,
-          expected_peak: notification.expected_peak,
-          trigger_reason: notification.trigger_reason,
-          recommended_actions: notification.recommended_actions,
-          urgency: notification.urgency,
-          timestamp: notification.timestamp,
-          read: notification.read,
-          prediction_data: notification.prediction_data as any,
-        },
-      });
-    } catch (error) {
-      console.error('Failed to store notification:', error);
-    }
   }
 }
