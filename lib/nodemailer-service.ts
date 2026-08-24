@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
-import { User } from '@prisma/client';
+import { User } from '@/app/generated/prisma';
 
 /**
  * Interface representing prediction payload data for a specific province.
@@ -173,10 +173,10 @@ function generateEmailContent(
   });
 
   // Get the appropriate risk level for coloring
-  const riskLevel = userProvincePrediction?.risk_level || nationalPrediction.average_risk;
+  const riskLevel = userProvincePrediction?.risk_level || nationalPrediction.average_risk || 'Low';
   
   // Dynamic colors based on risk level
-  const getRiskColors = (risk: string) => {
+  const getRiskColors = (risk: string = 'Low') => {
     const riskLower = risk.toLowerCase();
     if (riskLower === 'high') {
       return {

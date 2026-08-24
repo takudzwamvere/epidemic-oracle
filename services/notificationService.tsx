@@ -69,7 +69,7 @@ export class NotificationService {
         orderBy: { timestamp: 'desc' },
       });
 
-      return data.map(notif => ({
+      return data.map((notif: any) => ({
         ...notif,
         risk_level: notif.risk_level as 'High' | 'Medium' | 'Low',
         urgency: notif.urgency as 'critical' | 'high' | 'medium',
