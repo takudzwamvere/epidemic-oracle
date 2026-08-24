@@ -139,16 +139,28 @@ To add a new country or dataset without writing any new parsing code:
    // Result: [{ date: "2026-01-15", value: 42 }, ...]
    ```
 
+## 3. Pure Frontend Auth & 1-Click Guest Access (Prisma Removed)
+
+- **Prisma & Database Removal**:
+  - Removed `@prisma/client`, `@prisma/extension-accelerate`, and `prisma` dependencies from `package.json`.
+  - Deleted `prisma/`, `lib/prisma.ts`, and `app/generated/`.
+  - Converted `services/notificationService.tsx` and `lib/nodemailer-service.ts` to in-memory models.
+- **Environment & Hardcoded Admin Credentials**:
+  - `lib/users.ts` & `app/api/auth/login/route.ts` support environment variables with sensible defaults:
+    - **Admin:** `ADMIN_EMAIL` (default: `admin@epidemic-oracle.org`) / `ADMIN_PASSWORD` (default: `Admin123!`)
+    - **SuperAdmin:** `SUPERADMIN_EMAIL` (default: `superadmin@epidemic-oracle.org`) / `SUPERADMIN_PASSWORD` (default: `SuperAdmin123!`)
+- **1-Click Guest Access**:
+  - Created `/api/auth/guest` route: immediate 1-click login without password requirement.
+  - Added **"⚡ Guest Demo"** and **"⚡ 1-Click Guest Access"** buttons to the landing page header and hero.
+  - Added an instant **"Enter as Guest Epidemiologist →"** button on `/auth/login`.
+  - Redesigned `/protected` into a comprehensive User & Guest Access Portal linking directly to Admin, SuperAdmin, and Disease models.
+
 ---
 
 ## 4. Verification & Build Status
 
-- **Git Status:** All changes committed and merged into `master`.
+- **Git Status:** All changes committed to `master`.
 - **TypeScript:** `npx tsc --noEmit` exited cleanly with code `0` (zero errors).
-- **Prisma Client:** Generated to `./app/generated/prisma`.
-- **Production Build:** `npm run build` completed successfully:
-  - **Turbopack Compilation:** `✓ Compiled successfully in 22.7s`
-  - **Static Page Generation:** `✓ Generating static pages (32/32)`
-  - **All Routes:** 32 static / dynamic routes prerendered and optimized.
-- **Routing:** All routes verified (`/`, `/auth/login`, `/admin`, `/superadmin`, `/admin/reports`, `/admin/settings`, `/admin/datasets`, `/admin/upload`).
+- **Production Build:** `npm run build` completed with zero errors and generated all 33 static and dynamic routes.
+- **Vercel Deployment Compatibility:** Zero database requirements or build-step generator dependencies.
 - **Dev Server:** Operational on port `3001`.
