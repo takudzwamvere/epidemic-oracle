@@ -7,122 +7,124 @@ import {
   ArrowRight, 
   Database, 
   FileText, 
-  CheckCircle2, 
   Lock, 
   MapPin, 
   Globe2, 
   BarChart3,
-  Cpu
+  Cpu,
+  Layers,
+  Search,
+  Radio
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SUPPORTED_COUNTRIES } from "@/lib/datasets";
 
 export default function Home() {
   const kpiStats = [
     {
-      label: "Active Outbreak Engines",
-      value: "5 Models",
-      change: "Malaria, Cholera, COVID-19, Typhoid, Influenza",
+      label: "Surveillance Coverage",
+      value: "27 Nations",
+      change: "Pan-African & WHO Regional Monitoring",
       highlight: true
     },
     {
-      label: "Model Forecast Accuracy",
-      value: "89.2%",
-      change: "+2.1% benchmark improvement",
+      label: "Global Health Ingestion",
+      value: "570K+ Records",
+      change: "WHO COVID-19, Cholera & GLIDE series",
       highlight: false
     },
     {
-      label: "Early Warning Window",
-      value: "14-28 Days",
-      change: "Lead time before peak surge",
+      label: "Epidemic Vectors",
+      value: "8 Major Pathogens",
+      change: "Ebola, Cholera, COVID-19, Malaria, Mpox +",
       highlight: false
     },
     {
-      label: "Surveillance Coverage",
-      value: "10 Provinces",
-      change: "District-level granularity",
+      label: "Forecasting Pipeline",
+      value: "ARIMA Engine",
+      change: "Standardized { date, value }[] normalization",
       highlight: false
     }
   ];
 
-  const diseaseEngines = [
+  const coreDataStreams = [
     {
-      name: "Cholera Surveillance",
-      code: "CHO-01",
-      risk: "High Alert",
-      riskColor: "text-red-700 bg-red-50 border-red-200",
-      accuracy: "90.5%",
-      horizon: "30-Day Forecast",
-      method: "ARIMA Time-Series + Environmental Lag"
+      source: "WHO Global Daily Surveillance",
+      type: "Global Epidemiological Feed",
+      coverage: "Pan-African & Global",
+      cadence: "Daily Ingestion",
+      keyMetrics: "Confirmed Cases, Mortality Rates, Epidemic Waves",
+      status: "Active Stream",
+      statusColor: "text-emerald-700 bg-emerald-50 border-emerald-200"
     },
     {
-      name: "Malaria Outbreak Forecast",
-      code: "MAL-02",
-      risk: "Guarded",
-      riskColor: "text-amber-700 bg-amber-50 border-amber-200",
-      accuracy: "89.4%",
-      horizon: "60-Day Seasonal",
-      method: "Climatic Variance & Precipitation Index"
+      source: "INRB-UMIE Ebola Consolidated",
+      type: "Sub-National Health Zone Data",
+      coverage: "Democratic Republic of Congo (COD)",
+      cadence: "Daily Consolidated Reports",
+      keyMetrics: "Confirmed Cases, Cumulative Totals, Health Zone Vectors",
+      status: "Critical Surveillance",
+      statusColor: "text-red-700 bg-red-50 border-red-200"
     },
     {
-      name: "COVID-19 Trend Model",
-      code: "COV-03",
-      risk: "Optimal",
-      riskColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
-      accuracy: "88.7%",
-      horizon: "14-Day Trajectory",
-      method: "Transmission Velocity & Hospitalization"
+      source: "WHO Global Cholera adm0",
+      type: "National Administrative Surveillance",
+      coverage: "Multi-Country (COD, ZWE, NGA, ETH, etc.)",
+      cadence: "Epidemiological Weeks",
+      keyMetrics: "Case Totals, Death Totals, First/Last Epiweeks",
+      status: "Active Stream",
+      statusColor: "text-emerald-700 bg-emerald-50 border-emerald-200"
     },
     {
-      name: "Typhoid Fever Tracking",
-      code: "TYP-04",
-      risk: "Optimal",
-      riskColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
-      accuracy: "87.9%",
-      horizon: "30-Day Forecast",
-      method: "Sanitation Index & Case Reports"
+      source: "GLIDE Multi-Country Event Registry",
+      type: "Disaster & Epidemic Surge Archive",
+      coverage: "26 African Nations (CAF, MOZ, SDN, SOM, etc.)",
+      cadence: "Incident-Triggered",
+      keyMetrics: "Casualties, Displaced Populations, Outbreak Triggers",
+      status: "Active Archive",
+      statusColor: "text-blue-700 bg-blue-50 border-blue-200"
     },
     {
-      name: "Influenza Epidemic Monitor",
-      code: "INF-05",
-      risk: "Optimal",
-      riskColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
-      accuracy: "85.3%",
-      horizon: "45-Day Trend",
-      method: "Seasonal Moving Average Filter"
+      source: "BVD Mobility & Cohort Surveillance",
+      type: "Population Mobility Indicators",
+      coverage: "DRC (Ituri & North Kivu Cohorts)",
+      cadence: "Subscriber-Day Series",
+      keyMetrics: "Mobility Flow, Cohort Density, Vector Transmission Risk",
+      status: "Specialized Stream",
+      statusColor: "text-purple-700 bg-purple-50 border-purple-200"
     }
   ];
 
   const coreCapabilities = [
     {
-      icon: Cpu,
-      title: "In-Browser & Edge ARIMA Modeling",
-      description: "Autonomous forecasting pipeline processing raw epidemiological time-series datasets into predictive surge curves without external model servers."
+      icon: Database,
+      title: "Universal CSV Normalization Layer",
+      description: "Transforms heterogeneous multi-country CSV datasets (wide WHO tables, location-level health zone reports, GLIDE registries) into uniform { date, value }[] time series."
     },
     {
-      icon: Database,
-      title: "Unified Dataset Normalization",
-      description: "ISO3-standardized ingestion layer accommodating WHO surveillance feeds, localized health center CSVs, and GLIDE disaster reports seamlessly."
+      icon: Globe2,
+      title: "Pan-African & WHO Data Architecture",
+      description: "ISO3-indexed dataset hierarchy supporting 27 African nations, WHO global epidemiological repositories, and localized ministry surveillance feeds."
+    },
+    {
+      icon: Cpu,
+      title: "Autonomous In-Browser ARIMA Forecasting",
+      description: "Pure client-side time-series modeling engine executing outbreak surge projections, trajectory curves, and confidence intervals without remote inference dependencies."
     },
     {
       icon: MapPin,
-      title: "Geographic Risk Mapping",
-      description: "Interactive boundary-aware geographic mapping identifying emerging outbreak clusters across provincial and district health jurisdictions."
+      title: "Hotspot & Vector Localization",
+      description: "High-resolution geospatial risk assessment mapping contagion clusters across provinces, districts, and border crossing zones."
     },
     {
-      icon: AlertTriangle,
-      title: "Automated Protocol Alerts",
-      description: "Algorithmic alert dispatches generated when predicted transmission velocities surpass predefined standard deviation boundaries."
-    },
-    {
-      icon: FileText,
-      title: "Automated Data Quality Audits",
-      description: "Immediate schema validation, null-value detection, and format compliance scoring on uploaded CSV, JSON, and XML health records."
+      icon: Radio,
+      title: "Algorithmic Early Warning Alerts",
+      description: "Automated alert dispatches triggered when transmission velocities or case surge thresholds exceed historical variance boundaries."
     },
     {
       icon: Lock,
-      title: "Role-Governed Operations",
-      description: "Strict isolation between Health Administrator data upload workflows and Super-Administrator system-wide model orchestration."
+      title: "Role-Governed Platform Security",
+      description: "Segregated operational workspaces for health district data contributors, regional auditors, and super-administrators."
     }
   ];
 
@@ -133,13 +135,13 @@ export default function Home() {
         <div className="flex items-center gap-3">
           <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-slate-400">
             <span className="w-2 h-2 bg-emerald-500 rounded-none inline-block animate-pulse" />
-            SYSTEM ACTIVE: OPERATIONAL
+            GLOBAL SURVEILLANCE MATRIX: ACTIVE
           </span>
           <span className="hidden sm:inline text-slate-600">|</span>
-          <span className="hidden sm:inline text-slate-400">EPIDEMIOLOGICAL EARLY WARNING SYSTEM</span>
+          <span className="hidden sm:inline text-slate-400">27 PAN-AFRICAN NATIONS & WHO FEEDS LOADED</span>
         </div>
         <div className="flex items-center gap-4 font-mono text-[11px]">
-          <span className="text-slate-400">BUILD 2026.08-STABLE</span>
+          <span className="text-slate-400">DATASET LAYER V2.0</span>
         </div>
       </div>
 
@@ -155,7 +157,7 @@ export default function Home() {
                 EPIDEMIC ORACLE
               </span>
               <span className="text-[10px] uppercase font-mono tracking-widest text-slate-500 block leading-tight">
-                Predictive Intelligence Platform
+                Pan-African Epidemiological Intelligence
               </span>
             </div>
           </div>
@@ -180,29 +182,29 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 py-16 lg:py-20">
           <div className="max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 border border-slate-300 text-slate-800 text-xs font-mono font-semibold uppercase tracking-wider">
-              <Activity className="w-3.5 h-3.5 text-blue-600" />
-              Autonomous Predictive Analytics
+              <Globe2 className="w-3.5 h-3.5 text-blue-600" />
+              Multi-Nation Surveillance & Predictive Modeling
             </div>
 
             <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight">
-              Early Outbreak Forecasting & Surveillance Intelligence.
+              Standardized Outbreak Intelligence Across Pan-African & WHO Datasets.
             </h1>
 
             <p className="text-slate-600 text-lg leading-relaxed">
-              Epidemic Oracle standardizes heterogeneous epidemiological data streams to compute 
-              predictive surge timelines, quantify regional risk levels, and dispatch actionable 
-              early-warning guidance to health directors.
+              Epidemic Oracle harmonizes diverse epidemiological data streams—from WHO global COVID-19 
+              and cholera registries to INRB Ebola surveillance and 26-nation GLIDE emergency archives—powering 
+              in-browser ARIMA models for early epidemic warning.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link href="/auth/login">
                 <Button variant="primary" size="lg" className="font-bold text-sm uppercase tracking-wider px-6">
-                  Launch Surveillance Dashboard <ArrowRight className="w-4 h-4 ml-2" />
+                  Launch Surveillance Platform <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
-              <Link href="/auth/login">
+              <Link href="/superadmin">
                 <Button variant="outline" size="lg" className="font-bold text-sm uppercase tracking-wider px-6">
-                  Inspect Data Schema
+                  Explore Dataset Registry
                 </Button>
               </Link>
             </div>
@@ -236,20 +238,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Model Surveillance Matrix */}
+      {/* Active Ingested Data Streams Table */}
       <section className="py-12 border-b border-slate-300 bg-white">
         <div className="max-w-7xl mx-auto px-6 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 pb-4">
             <div>
               <div className="text-xs font-mono font-bold uppercase tracking-wider text-blue-600 mb-1">
-                Active Engines
+                Data Infrastructure
               </div>
               <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-                Disease Prediction Surveillance Matrix
+                Harmonized Epidemiological Data Streams
               </h2>
             </div>
             <span className="text-xs text-slate-500 font-mono">
-              REAL-TIME ACCURACY BENCHMARKS
+              NORMALIZED TO UNIFORM TIME SERIES
             </span>
           </div>
 
@@ -257,36 +259,36 @@ export default function Home() {
             <table className="w-full text-sm text-left">
               <thead className="text-xs text-slate-600 uppercase font-mono bg-slate-100 border-b border-slate-300">
                 <tr>
-                  <th className="px-5 py-3.5 font-bold">Engine Code</th>
-                  <th className="px-5 py-3.5 font-bold">Surveillance Target</th>
-                  <th className="px-5 py-3.5 font-bold">Risk Status</th>
-                  <th className="px-5 py-3.5 font-bold">Confidence</th>
-                  <th className="px-5 py-3.5 font-bold">Forecast Horizon</th>
-                  <th className="px-5 py-3.5 font-bold">Modeling Methodology</th>
+                  <th className="px-5 py-3.5 font-bold">Data Stream / Source</th>
+                  <th className="px-5 py-3.5 font-bold">Dataset Type</th>
+                  <th className="px-5 py-3.5 font-bold">Geographic Scope</th>
+                  <th className="px-5 py-3.5 font-bold">Reporting Cadence</th>
+                  <th className="px-5 py-3.5 font-bold">Observed Metrics</th>
+                  <th className="px-5 py-3.5 font-bold">Stream Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 font-medium bg-white">
-                {diseaseEngines.map((engine) => (
-                  <tr key={engine.code} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-5 py-4 font-mono text-xs text-slate-500 font-bold">
-                      {engine.code}
-                    </td>
+                {coreDataStreams.map((stream, idx) => (
+                  <tr key={idx} className="hover:bg-slate-50 transition-colors">
                     <td className="px-5 py-4 font-bold text-slate-900">
-                      {engine.name}
+                      {stream.source}
                     </td>
-                    <td className="px-5 py-4">
-                      <span className={`inline-block px-2.5 py-1 text-xs font-bold border uppercase tracking-wider font-mono ${engine.riskColor}`}>
-                        {engine.risk}
-                      </span>
+                    <td className="px-5 py-4 font-mono text-xs text-slate-600">
+                      {stream.type}
                     </td>
-                    <td className="px-5 py-4 font-mono text-slate-900 font-semibold">
-                      {engine.accuracy}
+                    <td className="px-5 py-4 text-slate-800 text-xs font-semibold">
+                      {stream.coverage}
+                    </td>
+                    <td className="px-5 py-4 text-slate-600 text-xs font-mono">
+                      {stream.cadence}
                     </td>
                     <td className="px-5 py-4 text-slate-600 text-xs">
-                      {engine.horizon}
+                      {stream.keyMetrics}
                     </td>
-                    <td className="px-5 py-4 text-slate-500 text-xs font-mono">
-                      {engine.method}
+                    <td className="px-5 py-4">
+                      <span className={`inline-block px-2.5 py-1 text-xs font-bold border uppercase tracking-wider font-mono ${stream.statusColor}`}>
+                        {stream.status}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -296,18 +298,59 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Supported Countries Directory */}
+      <section className="py-12 border-b border-slate-300 bg-slate-100">
+        <div className="max-w-7xl mx-auto px-6 space-y-6">
+          <div className="border-b border-slate-300 pb-4">
+            <div className="text-xs font-mono font-bold uppercase tracking-wider text-blue-600 mb-1">
+              Geographic Registry
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+              27 Pan-African Country Surveillance Profiles
+            </h2>
+            <p className="text-slate-600 text-sm mt-1">
+              Standardized `/public/datasets/{`{ISO3}`}/{`{source}`}.csv` architecture ready for plug-and-play expansion.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {SUPPORTED_COUNTRIES.map((country) => (
+              <div 
+                key={country.iso3} 
+                className="bg-white border border-slate-300 p-3.5 space-y-1 hover:border-blue-600 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 border border-blue-200">
+                    {country.iso3}
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    {country.region.split(" ")[0]}
+                  </span>
+                </div>
+                <div className="font-bold text-xs text-slate-900 truncate" title={country.name}>
+                  {country.name}
+                </div>
+                <div className="text-[10px] text-slate-500 truncate" title={country.primaryDiseases.join(", ")}>
+                  {country.primaryDiseases.join(", ")}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Core Architectural Capabilities */}
-      <section className="py-16 bg-slate-50 flex-1 border-b border-slate-300">
+      <section className="py-16 bg-white flex-1 border-b border-slate-300">
         <div className="max-w-7xl mx-auto px-6 space-y-8">
           <div className="max-w-2xl space-y-2">
             <div className="text-xs font-mono font-bold uppercase tracking-wider text-blue-600">
               System Architecture
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-              Built for Robust Epidemiological Operations
+              Modular Data Ingestion & Forecasting Pipeline
             </h2>
             <p className="text-slate-600 text-sm">
-              Standardized data ingestion, client-side statistical computation, and high-assurance governance.
+              Engineered to transform complex raw public health records into actionable predictive insights.
             </p>
           </div>
 
@@ -315,9 +358,9 @@ export default function Home() {
             {coreCapabilities.map((feature, idx) => (
               <div 
                 key={idx} 
-                className="bg-white border border-slate-300 p-6 space-y-4 hover:border-slate-400 transition-colors"
+                className="bg-slate-50 border border-slate-300 p-6 space-y-4 hover:border-slate-400 transition-colors"
               >
-                <div className="w-10 h-10 bg-slate-100 border border-slate-200 flex items-center justify-center text-blue-600">
+                <div className="w-10 h-10 bg-white border border-slate-300 flex items-center justify-center text-blue-600">
                   <feature.icon className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-bold text-slate-900">
@@ -328,27 +371,6 @@ export default function Home() {
                 </p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action Bar */}
-      <section className="bg-white py-12 border-b border-slate-300">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="border border-slate-300 bg-slate-100 p-8 sm:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-2xl">
-              <h3 className="text-2xl font-bold text-slate-900 tracking-tight">
-                Authorized Personnel Access
-              </h3>
-              <p className="text-slate-600 text-sm">
-                Log in to upload regional health records, review ARIMA forecast models, or configure alert distribution lists.
-              </p>
-            </div>
-            <Link href="/auth/login">
-              <Button variant="primary" size="lg" className="font-bold text-sm uppercase tracking-wider px-8 whitespace-nowrap">
-                Authenticate Session <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
@@ -365,7 +387,7 @@ export default function Home() {
             </span>
             <span className="text-slate-500">|</span>
             <span className="text-slate-400 text-[11px]">
-              Surveillance Intelligence Framework
+              Pan-African Epidemiological Intelligence Platform
             </span>
           </div>
 
@@ -374,8 +396,8 @@ export default function Home() {
               Surveillance Portal
             </Link>
             <span className="text-slate-700">/</span>
-            <Link href="/auth/login" className="hover:text-white transition-colors">
-              Upload Schema Guide
+            <Link href="/superadmin" className="hover:text-white transition-colors">
+              Dataset Registry
             </Link>
             <span className="text-slate-700">/</span>
             <span className="text-slate-500">
