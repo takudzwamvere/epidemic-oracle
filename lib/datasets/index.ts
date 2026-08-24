@@ -1,5 +1,5 @@
 /**
- * Barrel export for the dataset normalization layer.
+ * Barrel export for the dataset normalization layer and actual dataset catalog.
  */
 
 export { loadPublicDataset, loadPublicDatasets } from "./loader";
@@ -12,4 +12,10 @@ export {
   getDatasetsByCountry,
   type CountryMeta
 } from "./registry";
+export {
+  ACTUAL_DATASETS,
+  getActualDatasets,
+  getActualDatasetByName,
+  type ActualDataset
+} from "./actual-datasets";
 export type { DatasetConfig, TimeSeriesPoint } from "./types";
