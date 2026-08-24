@@ -157,10 +157,29 @@ To add a new country or dataset without writing any new parsing code:
 
 ---
 
-## 4. Verification & Build Status
+## 5. Actual Datasets Integration in Admin Suite
+
+- **Actual Dataset Catalog (`lib/datasets/actual-datasets.ts`)**:
+  - Inventories all real physical CSV files stored in `/public/datasets/`:
+    - `WHO-COVID-19-global-daily-data.csv` (573,360 records, 26.1 MB)
+    - `drc_ebola_cases_consolidated.csv` (5,318 records, 1.28 MB)
+    - `glide_events_global.csv` (11,250 events, 3.25 MB)
+    - `cholera_adm0_public.csv` (Global adm0 surveillance feed)
+    - `drc-bvd_ituri-cohort_subscriber-days-2026_06_08-v1.0-external.csv` & `drc-bvd_nk-cohort...`
+    - 26 sovereign national GLIDE disaster & epidemic event files (`zwe_glide_events.csv`, `nga_glide_events.csv`, `eth_glide_events.csv`, etc.).
+- **Admin Dashboard (`app/admin/page.tsx`)**:
+  - Replaced hardcoded dummy activity with real dataset metrics: total physical files, 570K+ ingested records, 27 sovereign repositories, and real file activity stream.
+- **Datasets Repository (`app/admin/datasets/page.tsx`)**:
+  - Populates the table with all actual physical datasets with real file sizes, record counts, country scopes, and working direct **Download** links.
+- **Quality Reports (`app/admin/reports/page.tsx`)**:
+  - Generates schema audits, column data types, missing value assessments, and normalization recommendations based on the actual ingested files.
+
+---
+
+## 6. Verification & Build Status
 
 - **Git Status:** All changes committed to `master`.
 - **TypeScript:** `npx tsc --noEmit` exited cleanly with code `0` (zero errors).
-- **Production Build:** `npm run build` completed with zero errors and generated all 33 static and dynamic routes.
-- **Vercel Deployment Compatibility:** Zero database requirements or build-step generator dependencies.
+- **Production Build:** `npm run build` completed with zero errors across all 33 routes.
+- **Vercel CI Compatibility:** Pure frontend Next.js architecture with zero database or Prisma build dependencies.
 - **Dev Server:** Operational on port `3001`.
