@@ -140,12 +140,16 @@ export function findUserByEmail(email: string): User | undefined {
 }
 
 export function findUserById(id: string): User | undefined {
-  return usersStore.find((u) => u.id === id);
+  if (!id) return undefined;
+  const targetId = id.trim();
+  return usersStore.find((u) => u.id === targetId);
 }
 
 export function createUser(data: Omit<User, 'id' | 'created_at' | 'updated_at'>): User {
   const newUser: User = {
     ...data,
+    email: data.email.trim().toLowerCase(),
+    username: data.username.trim(),
     id: `user-${Date.now()}`,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -155,18 +159,24 @@ export function createUser(data: Omit<User, 'id' | 'created_at' | 'updated_at'>)
 }
 
 export function updateUser(id: string, data: Partial<User>): User | null {
-  const index = usersStore.findIndex((u) => u.id === id);
+  if (!id) return null;
+  const targetId = id.trim();
+  const index = usersStore.findIndex((u) => u.id === targetId);
   if (index === -1) return null;
   usersStore[index] = {
     ...usersStore[index],
     ...data,
+    ...(data.email ? { email: data.email.trim().toLowerCase() } : {}),
+    ...(data.username ? { username: data.username.trim() } : {}),
     updated_at: new Date().toISOString(),
   };
   return usersStore[index];
 }
 
 export function deleteUser(id: string): boolean {
+  if (!id) return false;
+  const targetId = id.trim();
   const initialLength = usersStore.length;
-  usersStore = usersStore.filter((u) => u.id !== id);
+  usersStore = usersStore.filter((u) => u.id !== targetId);
   return usersStore.length < initialLength;
 }
