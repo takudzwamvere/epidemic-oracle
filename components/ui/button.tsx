@@ -14,7 +14,6 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Maps to epidemic-prediction's variant names
         default:   "bg-blue-600 text-white hover:bg-blue-700 border-transparent shadow-sm",
         primary:   "bg-blue-600 text-white hover:bg-blue-700 border-transparent shadow-sm",
         secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200 border-transparent",
@@ -40,36 +39,36 @@ const buttonVariants = cva(
   }
 );
 
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+  isLoading?: boolean;
+}
+
 /**
  * Reusable Button component aligned with epidemic-prediction design language.
  * Supports isLoading, asChild (Radix Slot), and all CVA variants.
  */
-function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  isLoading,
-  children,
-  ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-    isLoading?: boolean;
-  }) {
-  const Comp = asChild ? Slot : "button";
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, isLoading, children, disabled, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
 
-  return (
-    <Comp
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      disabled={isLoading || props.disabled}
-      {...props}
-    >
-      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      {children}
-    </Comp>
-  );
-}
+    return (
+      <Comp
+        ref={ref}
+        data-slot="button"
+        aria-busy={isLoading ? true : undefined}
+        className={cn(buttonVariants({ variant, size, className }))}
+        disabled={isLoading || disabled}
+        {...props}
+      >
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
+        {children}
+      </Comp>
+    );
+  }
+);
+Button.displayName = "Button";
 
 export { Button, buttonVariants };
