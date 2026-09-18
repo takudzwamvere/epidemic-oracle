@@ -8,8 +8,28 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Epidemic Oracle | Home",
-  description: "Machine Learning Powered epidemic prediction",
+  title: {
+    default: "Epidemic Oracle | Epidemic Prediction & Surveillance",
+    template: "%s | Epidemic Oracle",
+  },
+  description: "Machine Learning Powered epidemic prediction and outbreak surveillance platform for Southern and Central Africa.",
+  keywords: [
+    "Epidemic Oracle",
+    "Epidemic Prediction",
+    "Disease Surveillance",
+    "Machine Learning",
+    "ARIMA Forecasting",
+    "Public Health",
+    "Africa",
+  ],
+  authors: [{ name: "Epidemic Oracle Team" }],
+  icons: {
+    icon: "/favicon.ico",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -30,6 +50,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-
-
