@@ -7,7 +7,7 @@ import { LogOut, Loader2 } from 'lucide-react';
 
 /**
  * LogoutButton Component: Renders a button that clears the user session and routes to login.
- * Displays a loading state during the logout process.
+ * Displays a loading state during the logout process with accessibility cues.
  */
 export function LogoutButton() {
   const router = useRouter();
@@ -33,14 +33,17 @@ export function LogoutButton() {
       onClick={logout}
       disabled={isPending}
       variant="outline"
+      aria-label="Sign out of account"
       className="flex items-center gap-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-medium px-4 py-2 transition-all duration-200 rounded-lg shadow-sm"
     >
       {isPending ? (
-        <Loader2 className="w-4 h-4 text-slate-500 animate-spin" />
+        <Loader2 className="w-4 h-4 text-slate-500 animate-spin" aria-hidden="true" />
       ) : (
-        <LogOut className="w-4 h-4 text-slate-500" />
+        <LogOut className="w-4 h-4 text-slate-500" aria-hidden="true" />
       )}
-      <span className="hidden sm:inline">{isPending ? 'Logging out...' : 'Logout'}</span>
+      <span className="hidden sm:inline" aria-live="polite">
+        {isPending ? 'Logging out...' : 'Logout'}
+      </span>
     </Button>
   );
 }
