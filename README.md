@@ -1,10 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌐 Epidemic Oracle
 
-## Getting Started
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=flat&logo=tailwind-css)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-First, run the development server:
+Machine Learning Powered epidemic prediction and outbreak surveillance platform for Southern and Central Africa.
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js >= 18.17.0
+- npm, pnpm, or yarn
+
+### Installation & Development Server
 
 ```bash
+# Install dependencies
+npm install
+
+# Run the development server
 npm run dev
 # or
 yarn dev
@@ -14,37 +29,22 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🏗️ Architecture & Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Outbreak Forecasting:** Time-series analysis and ARIMA-based predictive modeling for regional epidemics (Cholera, Malaria, COVID-19, Typhoid).
+- **Surveillance Dashboards:** Interactive maps, risk stratification metrics, and automated alert generation.
+- **Role-Based Access Control:** Strict permission routing for SuperAdmin, Admin, and User roles with guest evaluation access.
+- **Normalized Data Pipeline:** Uniform CSV ingestion engine with country and sub-national aggregation.
 
-## Learn More
+## 🛡️ Security & Architecture Enhancements
 
-To learn more about Next.js, take a look at the following resources:
+- **Role-Based Middleware Redirections:** Enforces strict access control, blocking unauthorized routes.
+- **Backend API Route Hardening:** Protected CRUD endpoints under `/api/users` and `/api/users/[id]`.
+- **Decoupled Outbreak Alerts API:** REST endpoints `/api/notifications` and `/api/notifications/read`.
+- **Design Language Alignment:** Consistent slate/blue palettes, border hierarchy, and responsive UI components.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📦 Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## 🛡️ Security Enhancements (July 2026)
-
-The following security and code quality improvements have been implemented:
-* **Role-Based Middleware Redirections:** Enforce strict access control, blocking non-superadmins from `/superadmin/*` routes and non-admins/non-superadmins from `/admin/*` routes.
-* **Backend API Route Hardening:** Restrict all CRUD endpoints under `/api/users` and `/api/users/[id]` exclusively to the `SUPERADMIN` role.
-* **Client-Side Layout Redirection Fallbacks:** Correctly display the user's role and handle redirect checks gracefully in `AdminLayout` and `SuperAdminLayout`.
-* **Pruning Unused Libraries & Files:** Removed obsolete Resend, simpleEmailService, and EmailJS integrations, along with pruning `@google/generative-ai` and `@emailjs/browser` packages.
-* **Refactored Code Duplication:** Centralized the `useTypewriter` hook into a common utility under `lib/hooks.ts` across 5 pages.
-* **Integrated Outbreak Alerts REST API:** Implemented endpoints `/api/notifications` and `/api/notifications/read` to retrieve and mark notifications as read without exposing server-only database operations.
-* **Client-Side Component Decoupling:** Refactored `NotificationBell` to load data asynchronously, resolving Next.js compilation errors.
-* **Layout & Dashboard Visual Polish:** Stylized landing page, dashboards, datasets management grid, user tables, and password forms with cohesive slate/blue color palettes, borders, and animations.
-
-
+Optimized for deployment on [Vercel](https://vercel.com). Refer to [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for details.
