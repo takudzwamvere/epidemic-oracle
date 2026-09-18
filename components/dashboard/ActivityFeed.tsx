@@ -70,33 +70,39 @@ export function ActivityFeed({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto pr-2 space-y-3">
-        {activities.map((item) => (
-          <div
-            key={item.id}
-            className="flex gap-4 p-3 border border-slate-200 hover:bg-slate-50 transition-colors"
-          >
-            <div className="shrink-0 mt-1">
-              {item.type === "critical"   && <AlertTriangle className="w-5 h-5 text-red-600" />}
-              {item.type === "warning"    && <AlertTriangle className="w-5 h-5 text-amber-600" />}
-              {item.type === "info"       && <Info className="w-5 h-5 text-blue-600" />}
-              {item.type === "success"    && <CheckCircle className="w-5 h-5 text-emerald-600" />}
-              {item.type === "processing" && <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />}
-            </div>
-            <div className="flex flex-col gap-1 flex-1 min-w-0">
-              <span className="text-sm text-slate-800 leading-tight font-medium">
-                {item.message}
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500">{item.time}</span>
-                {item.badge && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 bg-slate-100 text-slate-600 border border-slate-200">
-                    {item.badge}
-                  </span>
-                )}
+        {activities.length === 0 ? (
+          <div className="py-8 text-center text-slate-400 text-sm">
+            No recent activity recorded
+          </div>
+        ) : (
+          activities.map((item) => (
+            <div
+              key={item.id}
+              className="flex gap-4 p-3 border border-slate-200 hover:bg-slate-50 transition-colors"
+            >
+              <div className="shrink-0 mt-1">
+                {item.type === "critical"   && <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />}
+                {item.type === "warning"    && <AlertTriangle className="w-5 h-5 text-amber-600" aria-hidden="true" />}
+                {item.type === "info"       && <Info className="w-5 h-5 text-blue-600" aria-hidden="true" />}
+                {item.type === "success"    && <CheckCircle className="w-5 h-5 text-emerald-600" aria-hidden="true" />}
+                {item.type === "processing" && <Loader2 className="w-5 h-5 text-slate-400 animate-spin" aria-hidden="true" />}
+              </div>
+              <div className="flex flex-col gap-1 flex-1 min-w-0">
+                <span className="text-sm text-slate-800 leading-tight font-medium">
+                  {item.message}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500">{item.time}</span>
+                  {item.badge && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 bg-slate-100 text-slate-600 border border-slate-200">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </CardContent>
     </Card>
   );
