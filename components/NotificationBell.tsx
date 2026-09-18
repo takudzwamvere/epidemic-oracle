@@ -146,9 +146,12 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
       {/* Notification Bell */}
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={`Outbreak notifications (${unreadCount} unread)`}
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
         className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all duration-150"
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="w-5 h-5" aria-hidden="true" />
         {unreadCount > 0 && (
           <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 bg-red-600 text-white text-[10px] font-bold rounded-full animate-bounce">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -158,7 +161,12 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
 
       {/* Notification Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-11 w-96 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-slate-100">
+        <div
+          role="region"
+          aria-label="Notifications list"
+          aria-live="polite"
+          className="absolute right-0 top-11 w-96 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-slate-100"
+        >
           <div className="p-4 bg-slate-50">
             <div className="flex items-center justify-between">
               <h3 className="text-slate-900 font-semibold text-sm">Outbreak Alerts</h3>
