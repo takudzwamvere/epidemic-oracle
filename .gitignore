@@ -41,3 +41,13 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# IDE & Editor artifacts
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS artifacts
+Thumbs.db
