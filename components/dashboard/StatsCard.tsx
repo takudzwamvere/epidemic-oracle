@@ -55,11 +55,14 @@ export function StatsCard({
             <p className="text-slate-400 text-[10px] mt-1">{description}</p>
           )}
           {trend && (
-            <div className="flex items-center text-xs mt-1">
+            <div
+              className="flex items-center text-xs mt-1"
+              aria-label={`${trendUp ? "Increased by" : "Decreased by"} ${trend} ${trendLabel}`}
+            >
               {trendUp ? (
-                <ArrowUpRight className="mr-1 h-3 w-3 text-emerald-600" />
+                <ArrowUpRight className="mr-1 h-3 w-3 text-emerald-600" aria-hidden="true" />
               ) : (
-                <ArrowDownRight className="mr-1 h-3 w-3 text-rose-600" />
+                <ArrowDownRight className="mr-1 h-3 w-3 text-rose-600" aria-hidden="true" />
               )}
               <span className={cn(trendUp ? "text-emerald-600" : "text-rose-600", "font-medium")}>
                 {trend}
