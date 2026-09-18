@@ -51,3 +51,25 @@ export interface TimeSeriesPoint {
   /** Numeric case count or value at this date */
   value: number;
 }
+
+/**
+ * Summary metadata for an indexed or uploaded disease dataset.
+ */
+export interface DatasetSummary {
+  /** Unique dataset identifier, e.g. "covid_zim", "cholera_drc" */
+  id: string;
+  /** Human-readable title of the dataset */
+  title: string;
+  /** Associated epidemic or condition */
+  disease: string;
+  /** ISO 3166-1 alpha-3 code */
+  iso3: string;
+  /** Total number of data records/rows */
+  recordCount: number;
+  /** Earliest date in the time series */
+  startDate?: string;
+  /** Latest date in the time series */
+  endDate?: string;
+  /** Whether the dataset is active for predictions */
+  isActive: boolean;
+}
