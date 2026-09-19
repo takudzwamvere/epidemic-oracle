@@ -136,6 +136,20 @@ export class NotificationService {
   }
 
   /**
+   * Marks all unread notifications as read and returns the updated count.
+   */
+  static async markAllAsRead(): Promise<number> {
+    let count = 0;
+    for (const notification of notificationsStore) {
+      if (!notification.read) {
+        notification.read = true;
+        count++;
+      }
+    }
+    return count;
+  }
+
+  /**
    * Counts the total number of unread notifications.
    */
   static async getUnreadCount(): Promise<number> {

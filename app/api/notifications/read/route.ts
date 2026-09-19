@@ -16,12 +16,8 @@ export async function POST(request: Request) {
     const { id, all } = await request.json();
 
     if (all) {
-      const notifications = await NotificationService.getAllNotifications();
-      const unreadNotifications = notifications.filter((n) => !n.read);
-      for (const notification of unreadNotifications) {
-        await NotificationService.markAsRead(notification.id);
-      }
-      return NextResponse.json({ message: 'All notifications marked as read' });
+      const count = await NotificationService.markAllAsRead();
+      return NextResponse.json({ message: 'All notifications marked as read', count });
     }
 
     if (!id) {
