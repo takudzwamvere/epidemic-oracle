@@ -46,7 +46,7 @@ export function StatsCard({
             {title}
           </p>
           <div className={cn("p-2 border rounded-full", colors[color])}>
-            <Icon className="h-4 w-4" />
+            <Icon className="h-4 w-4" aria-hidden="true" />
           </div>
         </div>
         <div className="flex flex-col mt-3">
