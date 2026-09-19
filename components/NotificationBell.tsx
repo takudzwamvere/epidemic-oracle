@@ -181,9 +181,10 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
+                  aria-label="Close notifications"
                   className="text-slate-400 hover:text-slate-600 transition-colors"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -196,20 +197,30 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
               </div>
             ) : notifications.length === 0 ? (
               <div className="p-8 text-center text-slate-500">
-                <Bell className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                <Bell className="w-8 h-8 mx-auto mb-2 text-slate-300" aria-hidden="true" />
                 <p className="text-sm">No outbreak alerts found</p>
               </div>
             ) : (
               notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-4 cursor-pointer transition-colors hover:bg-slate-50 flex gap-3 ${
+                  role="button"
+                  tabIndex={0}
+                  className={`p-4 cursor-pointer transition-colors hover:bg-slate-50 flex gap-3 focus:outline-none focus:bg-slate-50 ${
                     !notification.read ? 'bg-blue-50/30' : ''
                   }`}
                   onClick={() => {
                     handleMarkAsRead(notification.id);
                     onNotificationClick?.(notification);
                     setIsOpen(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleMarkAsRead(notification.id);
+                      onNotificationClick?.(notification);
+                      setIsOpen(false);
+                    }
                   }}
                 >
                   {getRiskIcon(notification.risk_level)}
