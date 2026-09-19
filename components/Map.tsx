@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png',
 });
 
-interface Prediction {
+export interface Prediction {
   province: string;
   predicted_cases: number;
   current_cases: number;
@@ -30,7 +30,7 @@ interface Prediction {
 /**
  * Props for the Map component containing epidemic predictions.
  */
-interface MapProps {
+export interface MapProps {
   predictions: Prediction[];
 }
 
@@ -93,5 +93,7 @@ const Map: React.FC<MapProps> = ({ predictions = [] }) => {
     </MapContainer>
   );
 };
+
+Map.displayName = 'Map';
 
 export default Map;
