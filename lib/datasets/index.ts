@@ -18,4 +18,4 @@ export {
   getActualDatasetByName,
   type ActualDataset
 } from "./actual-datasets";
-export type { DatasetConfig, TimeSeriesPoint } from "./types";
+export type { DatasetConfig, TimeSeriesPoint, DatasetSummary } from "./types";
