@@ -54,7 +54,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
         <Card className="border-slate-200/80 shadow-md">
           <CardHeader className="text-center space-y-2">
             <div className="w-12 h-12 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center mx-auto mb-1">
-              <CheckCircle2 className="w-6 h-6 text-emerald-600 animate-bounce" />
+              <CheckCircle2 className="w-6 h-6 text-emerald-600 animate-bounce" aria-hidden="true" />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight">Password Updated</CardTitle>
             <CardDescription className="text-slate-500">
@@ -71,7 +71,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
         <Card className="border-slate-200/80 shadow-md">
           <CardHeader className="space-y-2 text-center">
             <div className="w-12 h-12 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center mx-auto mb-1">
-              <ShieldAlert className="w-6 h-6 text-blue-600" />
+              <ShieldAlert className="w-6 h-6 text-blue-600" aria-hidden="true" />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight">Secure Your Account</CardTitle>
             <CardDescription className="text-slate-500">

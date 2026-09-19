@@ -52,7 +52,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
         <Card className="border-slate-200/80 shadow-md">
           <CardHeader className="text-center space-y-2">
             <div className="w-12 h-12 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center mx-auto mb-1">
-              <Mail className="w-6 h-6 text-blue-600" />
+              <Mail className="w-6 h-6 text-blue-600" aria-hidden="true" />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight">Check Your Email</CardTitle>
             <CardDescription className="text-slate-500">
@@ -68,7 +68,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
                 href="/auth/login"
                 className="flex items-center justify-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-4 h-4" aria-hidden="true" />
                 Back to Login
               </Link>
             </div>
@@ -78,7 +78,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
         <Card className="border-slate-200/80 shadow-md">
           <CardHeader className="space-y-2 text-center">
             <div className="w-12 h-12 bg-blue-50 border border-blue-100 rounded-full flex items-center justify-center mx-auto mb-1">
-              <KeyRound className="w-6 h-6 text-blue-600" />
+              <KeyRound className="w-6 h-6 text-blue-600" aria-hidden="true" />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight">Reset Password</CardTitle>
             <CardDescription className="text-slate-500">
