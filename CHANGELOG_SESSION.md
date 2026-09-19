@@ -30,6 +30,19 @@ A structured series of 17 atomic micro-polishes focusing on accessibility (ARIA)
 
 ---
 
+## 0.1 Code Quality & Micro-Polish Iteration (7 Commits)
+
+A focused follow-up series of 7 atomic commits enhancing accessibility, service efficiency, barrel exports, and type safety:
+1. `accessibility(notifications)`: Added `aria-label` to close button and keyboard navigation (`role="button"`, `tabIndex={0}`, `onKeyDown`) to notification items in `NotificationBell.tsx`.
+2. `accessibility(dashboard)`: Added `aria-hidden="true"` attribute to category badge icon in `StatsCard.tsx`.
+3. `refactor(services)`: Implemented batch `markAllAsRead()` on `NotificationService` and streamlined `app/api/notifications/read/route.ts`.
+4. `types(datasets)`: Re-exported `DatasetSummary` from `lib/datasets/index.ts` barrel.
+5. `types(map)`: Exported `Prediction` and `MapProps` interfaces and assigned `displayName` to `Map` component.
+6. `accessibility(auth)`: Added `aria-hidden="true"` to decorative icons in password recovery and update forms.
+7. `docs(changelog)`: Documented 7 micro-polish improvements in `CHANGELOG_SESSION.md`.
+
+---
+
 ## 1. Executive Summary
 
 This session executed two major tasks:
