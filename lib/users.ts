@@ -180,3 +180,11 @@ export function deleteUser(id: string): boolean {
   usersStore = usersStore.filter((u) => u.id !== targetId);
   return usersStore.length < initialLength;
 }
+
+export function findUsersByRole(role: User['role']): User[] {
+  return usersStore.filter((u) => u.role === role);
+}
+
+export function getUserCount(): number {
+  return usersStore.length;
+}
