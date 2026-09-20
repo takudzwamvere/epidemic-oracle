@@ -173,6 +173,13 @@ export class NotificationService {
     return notificationsStore.filter((n) => !n.read).length;
   }
 
+  /**
+   * Clears all notifications from the in-memory store.
+   */
+  static async clearAllNotifications(): Promise<void> {
+    notificationsStore = [];
+  }
+
   private static calculateExpectedPeak(): string {
     const now = new Date();
     const currentMonth = now.getMonth();
