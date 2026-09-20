@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -6,6 +6,12 @@ import "./globals.css";
 const inter = Inter({
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+  themeColor: "#2563eb",
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   title: {
@@ -25,6 +31,11 @@ export const metadata: Metadata = {
   authors: [{ name: "Epidemic Oracle Team" }],
   icons: {
     icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "Epidemic Oracle | Epidemic Prediction & Surveillance",
+    description: "Machine Learning Powered epidemic prediction and outbreak surveillance platform for Southern and Central Africa.",
+    type: "website",
   },
   robots: {
     index: true,
