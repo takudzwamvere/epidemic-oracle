@@ -9,13 +9,18 @@ export {
   SUPPORTED_COUNTRIES, 
   registryKeyToPath,
   getCountryByIso3,
+  getCountryByName,
   getDatasetsByCountry,
+  getDatasetsByDisease,
+  isValidRegistryKey,
   type CountryMeta
 } from "./registry";
 export {
   ACTUAL_DATASETS,
   getActualDatasets,
   getActualDatasetByName,
+  getActualDatasetById,
+  getActualDatasetsByCategory,
   type ActualDataset
 } from "./actual-datasets";
-export type { DatasetConfig, TimeSeriesPoint, DatasetSummary } from "./types";
+export type { DatasetConfig, TimeSeriesPoint, DatasetSummary, DatasetCategory, DatasetFilterOptions } from "./types";
