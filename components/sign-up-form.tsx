@@ -144,3 +144,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     </div>
   )
 }
+
+SignUpForm.displayName = 'SignUpForm';
+
+export type SignUpFormProps = React.ComponentPropsWithoutRef<'div'>;
