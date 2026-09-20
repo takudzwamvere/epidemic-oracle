@@ -88,6 +88,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
                   <Input
                     id="password"
                     type="password"
+                    autoComplete="new-password"
                     placeholder="••••••••"
                     required
                     value={password}
@@ -96,7 +97,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
                   />
                 </div>
                 {error && (
-                  <p className="text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-100 p-2.5 rounded-lg">
+                  <p role="alert" aria-live="polite" className="text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-100 p-2.5 rounded-lg">
                     ⚠️ {error}
                   </p>
                 )}
