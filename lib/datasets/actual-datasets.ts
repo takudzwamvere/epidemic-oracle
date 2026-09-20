@@ -370,3 +370,11 @@ export function getActualDatasets(): ActualDataset[] {
 export function getActualDatasetByName(name: string): ActualDataset | undefined {
   return ACTUAL_DATASETS.find((d) => d.name.toLowerCase() === name.toLowerCase());
 }
+
+export function getActualDatasetById(id: string): ActualDataset | undefined {
+  return ACTUAL_DATASETS.find((d) => d.id === id);
+}
+
+export function getActualDatasetsByCategory(category: ActualDataset['category']): ActualDataset[] {
+  return ACTUAL_DATASETS.filter((d) => d.category === category);
+}
