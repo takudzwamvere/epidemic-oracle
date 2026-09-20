@@ -15,7 +15,7 @@ export interface Activity {
   badge?: string;
 }
 
-interface ActivityFeedProps {
+export interface ActivityFeedProps {
   activities?: Activity[];
   title?: string;
   className?: string;
@@ -107,3 +107,5 @@ export function ActivityFeed({
     </Card>
   );
 }
+
+ActivityFeed.displayName = "ActivityFeed";
