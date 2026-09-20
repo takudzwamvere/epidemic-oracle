@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { ArrowDownRight, ArrowUpRight, LucideIcon } from "lucide-react";
 import React from "react";
 
-interface StatsCardProps {
+export interface StatsCardProps {
   title: string;
   value: string;
   trend?: string;
@@ -75,3 +75,5 @@ export function StatsCard({
     </Card>
   );
 }
+
+StatsCard.displayName = "StatsCard";
