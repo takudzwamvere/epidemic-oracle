@@ -26,12 +26,20 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return await bcrypt.compare(password, hash);
 }
 
+export interface SessionUser {
+  id: string;
+  email: string;
+  role: string;
+  username: string;
+  province: string;
+}
+
 /**
  * Creates and signs a new JWT session token for the user.
  * @param user The user object containing session details.
  * @returns A signed JWT string token.
  */
-export async function createSessionToken(user: { id: string; email: string; role: string; username: string; province: string }): Promise<string> {
+export async function createSessionToken(user: SessionUser): Promise<string> {
   return await new SignJWT({
     id: user.id,
     email: user.email,
@@ -43,14 +51,6 @@ export async function createSessionToken(user: { id: string; email: string; role
     .setIssuedAt()
     .setExpirationTime('7d')
     .sign(JWT_SECRET);
-}
-
-export interface SessionUser {
-  id: string;
-  email: string;
-  role: string;
-  username: string;
-  province: string;
 }
 
 /**
