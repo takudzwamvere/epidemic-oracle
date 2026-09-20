@@ -57,6 +57,18 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
     };
   }, []);
 
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
   /**
    * Queries the API for current notifications list and updates local state.
    */
