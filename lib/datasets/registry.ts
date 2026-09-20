@@ -184,3 +184,14 @@ export function getDatasetsByCountry(iso3: string): { key: string; config: Datas
     .filter(([_, config]) => config.iso3 === iso3)
     .map(([key, config]) => ({ key, config }));
 }
+
+export function getDatasetsByDisease(disease: string): { key: string; config: DatasetConfig }[] {
+  const normalized = disease.toLowerCase().trim();
+  return Object.entries(DATASET_REGISTRY)
+    .filter(([_, config]) => config.disease.toLowerCase().trim() === normalized)
+    .map(([key, config]) => ({ key, config }));
+}
+
+export function isValidRegistryKey(key: string): boolean {
+  return key in DATASET_REGISTRY;
+}
