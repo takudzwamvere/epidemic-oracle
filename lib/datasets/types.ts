@@ -73,3 +73,23 @@ export interface DatasetSummary {
   /** Whether the dataset is active for predictions */
   isActive: boolean;
 }
+
+/**
+ * Standard classification category for datasets.
+ */
+export type DatasetCategory =
+  | 'Global Feed'
+  | 'National Surveillance'
+  | 'Sub-National Outbreak'
+  | 'Disaster Registry'
+  | 'Mobility Cohort';
+
+/**
+ * Filter options for querying datasets in the catalog.
+ */
+export interface DatasetFilterOptions {
+  iso3?: string;
+  disease?: string;
+  category?: DatasetCategory;
+  processed?: boolean;
+}
