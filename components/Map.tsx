@@ -55,6 +55,8 @@ const Map: React.FC<MapProps> = ({ predictions = [] }) => {
       center={center}
       zoom={6}
       scrollWheelZoom={true}
+      aria-label="Epidemic Risk Map"
+      data-testid="epidemic-map-container"
       className="w-full h-full z-0"
     >
       <TileLayer
