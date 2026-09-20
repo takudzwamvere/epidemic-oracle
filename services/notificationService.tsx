@@ -126,6 +126,23 @@ export class NotificationService {
   }
 
   /**
+   * Retrieves a single notification by its ID.
+   */
+  static async getNotificationById(id: string): Promise<OutbreakNotification | null> {
+    const item = notificationsStore.find((n) => n.id === id);
+    return item ? { ...item } : null;
+  }
+
+  /**
+   * Deletes a notification by its ID and returns whether it was found.
+   */
+  static async deleteNotification(id: string): Promise<boolean> {
+    const prevLength = notificationsStore.length;
+    notificationsStore = notificationsStore.filter((n) => n.id !== id);
+    return notificationsStore.length < prevLength;
+  }
+
+  /**
    * Marks a specific notification as read.
    */
   static async markAsRead(notificationId: string): Promise<void> {
