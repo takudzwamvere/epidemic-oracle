@@ -24,7 +24,7 @@ export interface OutbreakNotification {
 /**
  * Props definition for the NotificationBell component.
  */
-interface NotificationBellProps {
+export interface NotificationBellProps {
   onNotificationClick?: (notification: OutbreakNotification) => void;
 }
 
@@ -283,5 +283,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNotificationClick
     </div>
   );
 };
+
+NotificationBell.displayName = 'NotificationBell';
 
 export default NotificationBell;
