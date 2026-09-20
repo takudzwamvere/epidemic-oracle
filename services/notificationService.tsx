@@ -99,7 +99,7 @@ export class NotificationService {
    */
   static async createOutbreakNotification(prediction: PredictionInput): Promise<OutbreakNotification> {
     const notification: OutbreakNotification = {
-      id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `notif_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
       disease: prediction.disease,
       province: prediction.province,
       risk_level: prediction.risk_level,
