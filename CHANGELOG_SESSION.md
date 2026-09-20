@@ -7,6 +7,40 @@
 
 ---
 
+## 0.2 Code Quality & Micro-Polish Iteration (28 Commits)
+
+A structured series of 28 atomic micro-polishes focusing on accessibility (ARIA, form auto-completion, keyboard dismiss), component type exports, display names, safe typing, dataset catalog querying, and SEO metadata:
+1. `accessibility(auth)`: Added `autoComplete` and `aria-hidden` attributes to `LoginForm` inputs and decorative icons (`components/login-form.tsx`).
+2. `refactor(auth)`: Implemented safe typing for error handling, `role="alert"` container, and exported `LoginFormProps` (`components/login-form.tsx`).
+3. `accessibility(auth)`: Added `autoComplete` attributes and `role="alert"` container to `SignUpForm` (`components/sign-up-form.tsx`).
+4. `types(auth)`: Exported `SignUpFormProps` and assigned `displayName` to `SignUpForm` (`components/sign-up-form.tsx`).
+5. `accessibility(auth)`: Added `autoComplete` and `role="alert"` to `ForgotPasswordForm` (`components/forgot-password-form.tsx`).
+6. `types(auth)`: Exported `ForgotPasswordFormProps` and assigned `displayName` to `ForgotPasswordForm` (`components/forgot-password-form.tsx`).
+7. `accessibility(auth)`: Added `autoComplete` and `role="alert"` to `UpdatePasswordForm` (`components/update-password-form.tsx`).
+8. `types(auth)`: Exported `UpdatePasswordFormProps` and assigned `displayName` to `UpdatePasswordForm` (`components/update-password-form.tsx`).
+9. `refactor(auth)`: Exported `LogoutButtonProps` with customizable classes and assigned `displayName` (`components/logout-button.tsx`).
+10. `accessibility(notifications)`: Added Escape keydown listener to close notification dropdown in `NotificationBell` (`components/NotificationBell.tsx`).
+11. `types(notifications)`: Exported `NotificationBellProps` and assigned `displayName` to `NotificationBell` (`components/NotificationBell.tsx`).
+12. `refactor(services)`: Replaced deprecated `substr` with standard `slice` in `NotificationService` ID generator (`services/notificationService.tsx`).
+13. `feat(services)`: Added `getNotificationById` and `deleteNotification` methods to `NotificationService` (`services/notificationService.tsx`).
+14. `feat(services)`: Added `clearAllNotifications` method to `NotificationService` (`services/notificationService.tsx`).
+15. `types(auth)`: Bound `SessionUser` interface into `createSessionToken` signature (`lib/auth.ts`).
+16. `refactor(auth)`: Added standard HTTP `cookie` header parsing fallback to `getSessionUser` (`lib/auth.ts`).
+17. `types(datasets)`: Added `DatasetCategory` and `DatasetFilterOptions` interfaces to dataset types (`lib/datasets/types.ts`).
+18. `feat(datasets)`: Added `getDatasetsByDisease` and `isValidRegistryKey` helpers to registry (`lib/datasets/registry.ts`).
+19. `feat(datasets)`: Added `getCountryByName` case-insensitive lookup to registry (`lib/datasets/registry.ts`).
+20. `feat(datasets)`: Added `getActualDatasetById` and `getActualDatasetsByCategory` to actual-datasets catalog (`lib/datasets/actual-datasets.ts`).
+21. `types(datasets)`: Re-exported new dataset helpers and types in dataset barrel (`lib/datasets/index.ts`).
+22. `refactor(email)`: Implemented safe error handling and added `isSmtpConfigured` status helper in `nodemailer-service` (`lib/nodemailer-service.ts`).
+23. `feat(users)`: Added `findUsersByRole` and `getUserCount` query helpers in users repository (`lib/users.ts`).
+24. `types(dashboard)`: Exported `ActivityFeedProps` and assigned `displayName` to `ActivityFeed` (`components/dashboard/ActivityFeed.tsx`).
+25. `types(dashboard)`: Exported `StatsCardProps` and assigned `displayName` to `StatsCard` (`components/dashboard/StatsCard.tsx`).
+26. `accessibility(map)`: Added accessible `aria-label` and `data-testid` to Leaflet Map container (`components/Map.tsx`).
+27. `seo(metadata)`: Added `viewport` themeColor and OpenGraph metadata configuration to root layout (`app/layout.tsx`).
+28. `docs(changelog)`: Recorded 28 micro-polish improvements in `CHANGELOG_SESSION.md`.
+
+---
+
 ## 0. Code Quality & Micro-Polish Iteration (17 Commits)
 
 A structured series of 17 atomic micro-polishes focusing on accessibility (ARIA), forwardRef type safety, SEO metadata, performance configurations, documentation, and error boundaries:
