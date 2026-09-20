@@ -56,6 +56,13 @@ const createTransporter = () => {
   });
 };
 
+/**
+ * Checks whether SMTP environment variables are properly configured.
+ */
+export const isSmtpConfigured = (): boolean => {
+  return Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+};
+
 export const getActiveUsers = async (): Promise<User[]> => {
   return getAllUsers().filter((u) => u.is_active);
 };
@@ -63,8 +70,8 @@ export const getActiveUsers = async (): Promise<User[]> => {
 export const getTotalUsersCount = async (): Promise<{ count: number; error?: string }> => {
   try {
     return { count: getAllUsers().length };
-  } catch (error: any) {
-    return { count: 0, error: error.message || 'Failed to get count' };
+  } catch (error: unknown) {
+    return { count: 0, error: error instanceof Error ? error.message : 'Failed to get count' };
   }
 };
 
