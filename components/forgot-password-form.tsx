@@ -129,3 +129,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
     </div>
   );
 }
+
+ForgotPasswordForm.displayName = 'ForgotPasswordForm';
+
+export type ForgotPasswordFormProps = React.ComponentPropsWithoutRef<'div'>;
