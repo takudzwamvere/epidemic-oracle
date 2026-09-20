@@ -74,7 +74,16 @@ export async function verifySessionToken(token: string): Promise<SessionUser | n
  */
 export async function getSessionUser(request: Request | NextRequest): Promise<SessionUser | null> {
   const nextReq = request as NextRequest;
-  const token = nextReq.cookies?.get?.('session')?.value;
+  let token = nextReq.cookies?.get?.('session')?.value;
+
+  if (!token && typeof request.headers?.get === 'function') {
+    const cookieHeader = request.headers.get('cookie') || '';
+    const match = cookieHeader.match(/(?:^|;\s*)session=([^;]+)/);
+    if (match) {
+      token = decodeURIComponent(match[1]);
+    }
+  }
+
   if (!token) return null;
   return await verifySessionToken(token);
 }
