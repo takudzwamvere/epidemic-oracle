@@ -195,3 +195,8 @@ export function getDatasetsByDisease(disease: string): { key: string; config: Da
 export function isValidRegistryKey(key: string): boolean {
   return key in DATASET_REGISTRY;
 }
+
+export function getCountryByName(name: string): CountryMeta | undefined {
+  const normalized = name.toLowerCase().trim();
+  return SUPPORTED_COUNTRIES.find((c) => c.name.toLowerCase().trim() === normalized);
+}
