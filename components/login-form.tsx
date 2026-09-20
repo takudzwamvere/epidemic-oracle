@@ -83,7 +83,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       <Card className="rounded-none border-slate-300 shadow-sm bg-white">
         <CardHeader className="border-b border-slate-100 pb-4">
           <div className="flex items-center gap-2 text-blue-600 text-xs font-mono font-bold uppercase tracking-wider mb-1">
-            <Shield className="w-4 h-4" />
+            <Shield className="w-4 h-4" aria-hidden="true" />
             <span>Secure Authentication</span>
           </div>
           <CardTitle className="text-2xl font-black tracking-tight text-slate-900">Sign In</CardTitle>
@@ -96,7 +96,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           <div className="bg-slate-50 border border-slate-200 p-4 space-y-2.5">
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-slate-900 flex items-center gap-1.5 font-mono">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                <Sparkles className="w-3.5 h-3.5 text-blue-600" aria-hidden="true" />
                 INSTANT GUEST ACCESS
               </span>
               <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 border border-emerald-200 font-bold">
@@ -130,6 +130,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               <Input
                 id="email"
                 type="email"
+                autoComplete="email"
                 placeholder="admin@epidemic-oracle.org"
                 required
                 value={email}
@@ -150,6 +151,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               <Input
                 id="password"
                 type="password"
+                autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
