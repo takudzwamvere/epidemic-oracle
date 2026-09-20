@@ -116,3 +116,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
     </div>
   );
 }
+
+UpdatePasswordForm.displayName = 'UpdatePasswordForm';
+
+export type UpdatePasswordFormProps = React.ComponentPropsWithoutRef<'div'>;
