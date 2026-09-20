@@ -66,8 +66,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       })
       if (!response.ok) throw new Error('Guest login failed')
       router.push('/admin')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Guest login failed')
       setIsGuestLoading(false)
     }
   }
@@ -160,7 +160,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             </div>
 
             {error && (
-              <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
+              <div role="alert" aria-live="polite" className="p-2.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
                 {error}
               </div>
             )}
@@ -199,3 +199,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     </div>
   )
 }
+
+LoginForm.displayName = 'LoginForm';
+
+export type LoginFormProps = React.ComponentPropsWithoutRef<'div'>;
